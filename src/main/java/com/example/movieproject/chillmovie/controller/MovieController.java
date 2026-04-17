@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.movieproject.chillmovie.entity.Movie;
 import com.example.movieproject.chillmovie.service.MovieService;
-import org.springframework.web.bind.annotation.RequestParam;
+import com.example.movieproject.chillmovie.service.error.IdInvalidException;
 
 @RestController
 public class MovieController {
@@ -40,7 +41,11 @@ public class MovieController {
     }
 
     @DeleteMapping("/movies/{id}")
-    public ResponseEntity<String> deleteMovie(@PathVariable Long id) {
+    public ResponseEntity<String> deleteMovie(@PathVariable Long id) throws IdInvalidException {
+        if (id >= 1500) {
+            throw new IdInvalidException("ID must be less than 1500");
+        }
+
         movieService.deleteMovie(id);
         // return ResponseEntity.status(HttpStatus.OK).body("Movie deleted
         // successfully");
