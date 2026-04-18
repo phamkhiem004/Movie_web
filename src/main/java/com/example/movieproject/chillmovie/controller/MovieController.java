@@ -2,6 +2,8 @@ package com.example.movieproject.chillmovie.controller;
 
 import java.util.List;
 
+import com.example.movieproject.chillmovie.DTO.CreateMovieRequest;
+import com.example.movieproject.chillmovie.DTO.UpdateMovieRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,25 +33,23 @@ public class MovieController {
         return ResponseEntity.status(HttpStatus.OK).body(movies);
     }
 
-    @PostMapping("/movies")
+    @PostMapping("/movie/create")
     public ResponseEntity<Movie> createMovie(
-            @RequestBody Movie postManMovie) {
+            @RequestBody CreateMovieRequest request) {
 
-        Movie createdMovie = this.movieService.createMovie(postManMovie);
+        Movie createdMovie = this.movieService.createMovie(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdMovie);
 
     }
 
-    @DeleteMapping("/movies/{id}")
-    public ResponseEntity<String> deleteMovie(@PathVariable Long id) throws IdInvalidException {
+    @DeleteMapping("/movies/{id}/delete")
+    public ResponseEntity<Object> deleteMovie(@PathVariable Long id) throws IdInvalidException {
         if (id >= 1500) {
             throw new IdInvalidException("ID must be less than 1500");
         }
 
         movieService.deleteMovie(id);
-        // return ResponseEntity.status(HttpStatus.OK).body("Movie deleted
-        // successfully");
-        return ResponseEntity.ok("Movie deleted successfully");
+        return ResponseEntity.ok().body(java.util.Map.of("message", "Movie deleted successfully"));
 
     }
 
@@ -59,8 +59,8 @@ public class MovieController {
         return ResponseEntity.status(HttpStatus.OK).body(movie);
     }
 
-    @PutMapping("/movies/{id}")
-    public ResponseEntity<Movie> updateMovie(@PathVariable Long id, @RequestBody Movie movie) {
+    @PutMapping("/movies/{id}/update")
+    public ResponseEntity<Movie> updateMovie(@PathVariable Long id, @RequestBody UpdateMovieRequest movie) {
         Movie updatedMovie = movieService.updateMovie(id, movie);
         return ResponseEntity.status(HttpStatus.OK).body(updatedMovie);
     }

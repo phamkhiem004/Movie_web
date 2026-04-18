@@ -37,6 +37,18 @@ public class UserController {
         User updateUser = userService.activeUser(id);
         return ResponseEntity.status(HttpStatus.OK).body(updateUser);
     }
+    @PatchMapping("user/{id}/block")
+    public ResponseEntity<User> blockUser(@PathVariable Long id) {
+        User updateUser = userService.blockUser(id);
+        return ResponseEntity.status(HttpStatus.OK).body(updateUser);
+    }
+
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+        User user = userService.getUserByID(id);
+        return ResponseEntity.status(HttpStatus.OK).body(user);
+    }
 
 
 }

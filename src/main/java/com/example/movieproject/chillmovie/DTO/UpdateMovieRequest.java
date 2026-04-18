@@ -1,0 +1,22 @@
+package com.example.movieproject.chillmovie.DTO;
+
+import java.util.List;
+
+public class UpdateMovieRequest {
+    public String title;
+    public String description;
+    public Integer duration;
+    public String country;
+    public String language;
+    public Integer ageLimit;
+    public String trailerUrl;
+    public String posterUrl;
+
+    public List<Integer> genreIds;
+    public List<ActorRequest> actors;
+
+    public static class ActorRequest {
+        public Long actorId;
+        public String roleName;
+    }
+}
