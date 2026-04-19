@@ -142,4 +142,11 @@ public class MovieService {
         return movie;
     }
 
+    public List<Movie> findMovieByActorId(Long actorId) {
+        return movieRepository.findMoviesByActorId(actorId);
+    }
+    public List<Movie> findMovieByGenreId(Long genreId) {
+        return movieRepository.findMoviesByGenreId(genreId);
+    }
+
 }

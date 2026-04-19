@@ -65,4 +65,16 @@ public class MovieController {
         return ResponseEntity.status(HttpStatus.OK).body(updatedMovie);
     }
 
+    @GetMapping("/movies/actor/{id}")
+    public ResponseEntity<List<Movie>> getMovieByActorID(@PathVariable Long id) {
+        List<Movie> movies = movieService.findMovieByActorId(id);
+        return ResponseEntity.status(HttpStatus.OK).body(movies);
+    }
+
+    @GetMapping("/movies/genre/{id}")
+    public ResponseEntity<List<Movie>> getMovieByGenreID(@PathVariable Long id) {
+        List<Movie> movies = movieService.findMovieByGenreId(id);
+        return ResponseEntity.status(HttpStatus.OK).body(movies);
+    }
+
 }
