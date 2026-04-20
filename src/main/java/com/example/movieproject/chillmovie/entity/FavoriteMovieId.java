@@ -2,7 +2,9 @@ package com.example.movieproject.chillmovie.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
 
@@ -12,6 +14,8 @@ import java.util.Objects;
 @Getter
 @Setter
 @Embeddable
+@NoArgsConstructor
+@AllArgsConstructor
 public class FavoriteMovieId implements Serializable {
     private static final long serialVersionUID = 4328936942711575048L;
     @Column(name = "user_id", nullable = false)

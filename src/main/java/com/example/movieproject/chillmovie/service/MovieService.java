@@ -1,5 +1,7 @@
 package com.example.movieproject.chillmovie.service;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,6 +10,7 @@ import com.example.movieproject.chillmovie.projection.MovieProjection;
 import com.example.movieproject.chillmovie.projection.WatchHistoryProjection;
 import com.example.movieproject.chillmovie.respository.MovieActorRepository;
 import com.example.movieproject.chillmovie.respository.MovieGenreRepository;
+import com.example.movieproject.chillmovie.respository.UserRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,11 +25,13 @@ public class MovieService {
     private final MovieRepository movieRepository;
     private final MovieGenreRepository movieGenreRepository;
     private final MovieActorRepository movieActorRepository;
+    private final UserRepository userRepository;
 
-    public MovieService(MovieRepository movieRepository, MovieGenreRepository movieGenreRepository, MovieActorRepository movieActorRepository) {
+    public MovieService(MovieRepository movieRepository, MovieGenreRepository movieGenreRepository, MovieActorRepository movieActorRepository, UserRepository userRepository) {
         this.movieRepository = movieRepository;
         this.movieGenreRepository = movieGenreRepository;
         this.movieActorRepository = movieActorRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Movie> getAllMovies() {
@@ -44,6 +49,11 @@ public class MovieService {
     //Danh sách full phim kèm lịch sử bản thân
     public List<MovieProjection> getALlMovieWithHistory(Long userId) {
         return movieRepository.findAllMoviesWithHistory(userId);
+    }
+
+    //Danh sách phim yêu thích
+    public List<Movie> getAllFavouriteMovies(Long userId) {
+        return movieRepository.findFavoriteByUserId(userId);
     }
 
     //Lịch sử xem phim
