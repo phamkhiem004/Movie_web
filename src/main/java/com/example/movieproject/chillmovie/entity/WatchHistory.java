@@ -29,6 +29,10 @@ public class WatchHistory {
     @JoinColumn(name = "movie_id", nullable = false)
     private Movie movie;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "episode_id")
+    private Episode episode;
+
     @ColumnDefault("0")
     @Column(name = "watched_seconds")
     private Integer watchedSeconds;

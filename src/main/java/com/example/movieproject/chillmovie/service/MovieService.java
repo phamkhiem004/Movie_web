@@ -4,8 +4,12 @@ import java.util.List;
 import java.util.Optional;
 
 import com.example.movieproject.chillmovie.entity.*;
+import com.example.movieproject.chillmovie.projection.MovieProjection;
+import com.example.movieproject.chillmovie.projection.WatchHistoryProjection;
 import com.example.movieproject.chillmovie.respository.MovieActorRepository;
 import com.example.movieproject.chillmovie.respository.MovieGenreRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.movieproject.chillmovie.respository.MovieRepository;
@@ -29,12 +33,23 @@ public class MovieService {
         return movieRepository.findAll();
     }
 
+
     public Movie getMovieByID(Long id) {
         Optional<Movie> movieOptional = movieRepository.findById(id);// do findById trả về Optional để tránh lỗi
                                                                      // NullPointerException khi không tìm thấy movie
                                                                      // với id đó
         // nếu movie tồn tại, trả về movie đó
         return movieOptional.orElse(null);
+    }
+    //Danh sách full phim kèm lịch sử bản thân
+    public List<MovieProjection> getALlMovieWithHistory(Long userId) {
+        return movieRepository.findAllMoviesWithHistory(userId);
+    }
+
+    //Lịch sử xem phim
+    public List<WatchHistoryProjection> getAllHistoryMovies(Long userId) {
+        Pageable pageable = PageRequest.of(0, 5);
+        return movieRepository.findHistory(userId,pageable);
     }
 
     public Movie createMovie(CreateMovieRequest request) {

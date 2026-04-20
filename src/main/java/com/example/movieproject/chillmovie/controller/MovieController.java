@@ -4,16 +4,11 @@ import java.util.List;
 
 import com.example.movieproject.chillmovie.DTO.CreateMovieRequest;
 import com.example.movieproject.chillmovie.DTO.UpdateMovieRequest;
+import com.example.movieproject.chillmovie.projection.MovieProjection;
+import com.example.movieproject.chillmovie.projection.WatchHistoryProjection;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.movieproject.chillmovie.entity.Movie;
 import com.example.movieproject.chillmovie.service.MovieService;
@@ -27,9 +22,17 @@ public class MovieController {
         this.movieService = movieService;
     }
 
+    //Hiển thị khi chưa login
     @GetMapping("/movies")
     public ResponseEntity<List<Movie>> getAllMovies() {
         List<Movie> movies = movieService.getAllMovies();
+        return ResponseEntity.status(HttpStatus.OK).body(movies);
+    }
+
+    //Hiển thị khi đã login
+    @GetMapping("/movies/user/{id}")
+    public ResponseEntity<List<MovieProjection>> getMovie(@PathVariable Long id) throws IdInvalidException {
+        List<MovieProjection> movies = movieService.getALlMovieWithHistory(id);
         return ResponseEntity.status(HttpStatus.OK).body(movies);
     }
 
@@ -75,6 +78,12 @@ public class MovieController {
     public ResponseEntity<List<Movie>> getMovieByGenreID(@PathVariable Long id) {
         List<Movie> movies = movieService.findMovieByGenreId(id);
         return ResponseEntity.status(HttpStatus.OK).body(movies);
+    }
+
+    @GetMapping("/recent/user/{id}")
+    public ResponseEntity<List<WatchHistoryProjection>> getMovieHistoryByUser(@PathVariable Long id) {
+        List<WatchHistoryProjection> history = movieService.getAllHistoryMovies(id);
+        return ResponseEntity.status(HttpStatus.OK).body(history);
     }
 
 }
