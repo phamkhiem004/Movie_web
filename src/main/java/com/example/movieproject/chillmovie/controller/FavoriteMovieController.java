@@ -40,22 +40,13 @@ public class FavoriteMovieController {
     @DeleteMapping("/unlike/{userId}/{movieId}")
     public ResponseEntity<RestResponse<Boolean>> unlikeMovie(@PathVariable Long userId, @PathVariable Long movieId) {
 
+        favoriteMovieService.unlikeMovie(userId, movieId);
         RestResponse<Boolean> res = new RestResponse<>();
+        res.setStatusCode(200);
+        res.setMessage("Thành công");
+        res.setData(true); // Tùy chọn
 
-        if (favoriteMovieService.checkIfUserLikedMovie(userId, movieId)) {
-            favoriteMovieService.unlikeMovie(userId, movieId);
-
-            res.setStatusCode(200);
-            res.setMessage("Đã bỏ yêu thích");
-            res.setData(true);
-            return ResponseEntity.ok(res);
-
-        } else {
-            res.setStatusCode(400);
-            res.setMessage("Phim chưa được yêu thích");
-            res.setData(false);
-            return ResponseEntity.badRequest().body(res);
-        }
+        return ResponseEntity.ok(res);
 
     }
 
