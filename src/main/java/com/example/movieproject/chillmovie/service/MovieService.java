@@ -249,8 +249,22 @@ public class MovieService {
         }).toList();
     }
 
-    public List<Movie> findMovieByGenreId(Long genreId) {
-        return movieRepository.findMoviesByGenreId(genreId);
+    public List<MovieDTO> findMovieByGenreId(Long genreId) {
+        List<Movie> movies = movieRepository.findMoviesByGenreId(genreId);
+
+        return movies.stream().map(m -> {
+            MovieDTO dto = new MovieDTO();
+            dto.setId(m.getId());
+            dto.setTitle(m.getTitle());
+            dto.setDescription(m.getDescription());
+            dto.setDuration(m.getDuration());
+            dto.setCountry(m.getCountry());
+            dto.setLanguage(m.getLanguage());
+            dto.setAgeLimit(m.getAgeLimit());
+            dto.setTrailerUrl(m.getTrailerUrl());
+            dto.setPosterUrl(m.getPosterUrl());
+            return dto;
+        }).toList();
     }
 
 }
