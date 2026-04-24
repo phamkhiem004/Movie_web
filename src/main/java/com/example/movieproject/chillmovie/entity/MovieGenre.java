@@ -20,4 +20,9 @@ public class MovieGenre {
     @JoinColumn(name = "movie_id", nullable = false)
     private Movie movie;
 
+    @MapsId("genreId")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "genre_id", nullable = false)
+    private Genre genre;
+
 }

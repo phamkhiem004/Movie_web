@@ -3,6 +3,7 @@ package com.example.movieproject.chillmovie.controller;
 import java.util.List;
 
 import com.example.movieproject.chillmovie.DTO.CreateMovieRequest;
+import com.example.movieproject.chillmovie.DTO.MovieDTO;
 import com.example.movieproject.chillmovie.DTO.UpdateMovieRequest;
 import com.example.movieproject.chillmovie.projection.MovieProjection;
 import com.example.movieproject.chillmovie.projection.WatchHistoryProjection;
@@ -69,8 +70,8 @@ public class MovieController {
     }
 
     @GetMapping("/movies/actor/{id}")
-    public ResponseEntity<List<Movie>> getMovieByActorID(@PathVariable Long id) {
-        List<Movie> movies = movieService.findMovieByActorId(id);
+    public ResponseEntity<List<MovieDTO>> getMovieByActorID(@PathVariable Long id) {
+        List<MovieDTO> movies = movieService.findMovieByActorId(id);
         return ResponseEntity.status(HttpStatus.OK).body(movies);
     }
 
@@ -78,6 +79,12 @@ public class MovieController {
     public ResponseEntity<List<Movie>> getMovieByGenreID(@PathVariable Long id) {
         List<Movie> movies = movieService.findMovieByGenreId(id);
         return ResponseEntity.status(HttpStatus.OK).body(movies);
+    }
+
+    @GetMapping("/movie/{id}/user/{userid}")
+    public ResponseEntity<MovieDTO> getMovieByUserID(@PathVariable Long id, @PathVariable Long userid) {
+        MovieDTO movie = movieService.getMovieDetail(id, userid);
+        return ResponseEntity.status(HttpStatus.OK).body(movie);
     }
 
     @GetMapping("/recent/user/{id}")

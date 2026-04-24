@@ -26,7 +26,7 @@ public class SearchController {
         return movieSearchService.getSuggestions(q);
     }
 
-    // 2. API TÌM KIẾM PHIM VÀ PHÂN TRANG
+    // 2. API TÌM KIẾM PHIM VÀ PHÂN TRANG//Search theo tên + thể loại
     // Cách gọi: GET /api/search/movies?q=a&genreIds=1,3,5&page=0&size=20
     @GetMapping("/search/movies")
     public MovieSearchResponseDto searchMovies(

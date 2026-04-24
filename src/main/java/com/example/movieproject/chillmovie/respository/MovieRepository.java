@@ -1,5 +1,6 @@
 package com.example.movieproject.chillmovie.respository;
 
+import com.example.movieproject.chillmovie.DTO.MovieDTO;
 import com.example.movieproject.chillmovie.entity.FavoriteMovie;
 import com.example.movieproject.chillmovie.projection.MovieProjection;
 import com.example.movieproject.chillmovie.projection.WatchHistoryProjection;
@@ -23,6 +24,16 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     //Tìm kiếm phim yêu thích bởi user
     @Query("SELECT fm.movie FROM FavoriteMovie fm WHERE fm.user.id = :userId")
     List<Movie> findFavoriteByUserId(@Param("userId") Long userId);
+
+    @Query("""
+                SELECT DISTINCT m FROM Movie m
+                LEFT JOIN FETCH m.movieActors ma
+                LEFT JOIN FETCH ma.actor
+                LEFT JOIN FETCH m.movieGenres mg
+                LEFT JOIN FETCH mg.genre
+                WHERE m.id = :movieId
+            """)
+    Movie findMovieDetail(Long movieId);
 
     //Tìm tất cả các phim với lịch sử xem
     @Query("SELECT " +
@@ -63,10 +74,7 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
             "LEFT JOIN Episode e ON wh.episode.id = e.id " +
             "WHERE wh.user.id = :userId " +
             "ORDER BY wh.lastWatchedAt DESC")
-    List<WatchHistoryProjection> findHistory(@Param("userId")Long userId, Pageable pageable);
-
-
-
+    List<WatchHistoryProjection> findHistory(@Param("userId") Long userId, Pageable pageable);
 
 
 }

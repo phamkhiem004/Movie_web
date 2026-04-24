@@ -23,4 +23,9 @@ public class MovieActor {
     @Column(name = "role_name", length = 150)
     private String roleName;
 
+    @MapsId("actorId")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "actor_id", nullable = false)
+    private Actor actor;
+
 }
