@@ -37,12 +37,10 @@ public class User {
 
     @ColumnDefault("'ACTIVE'")
     @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private String status;
+    private UserStatus status;
 
-    @ColumnDefault("0")
-    @Column(name = "is_deleted")
-    private Boolean isDeleted;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "created_at")

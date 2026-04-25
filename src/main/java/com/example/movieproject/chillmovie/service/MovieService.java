@@ -181,6 +181,7 @@ public class MovieService {
         movie.setLanguage(request.language);
         movie.setCountry(request.country);
         movie.setAgeLimit(request.ageLimit);
+        movie.setType(request.type);
 
         movieRepository.save(movie);
 
