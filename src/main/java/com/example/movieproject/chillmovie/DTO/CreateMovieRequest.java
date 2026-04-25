@@ -1,5 +1,8 @@
 package com.example.movieproject.chillmovie.DTO;
 
+import com.example.movieproject.chillmovie.entity.Episode;
+import com.example.movieproject.chillmovie.entity.MovieType;
+
 import java.util.List;
 
 public class CreateMovieRequest {
@@ -11,12 +14,15 @@ public class CreateMovieRequest {
     public Integer ageLimit;
     public String trailerUrl;
     public String posterUrl;
+    public MovieType type;
 
     public List<Integer> genreIds;
     public List<ActorRequest> actors;
+    public List<EpisodeRequest> episodes;
 
     public static class ActorRequest {
         public Long actorId;
         public String roleName;
     }
+
 }

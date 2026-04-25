@@ -1,22 +1,19 @@
 package com.example.movieproject.chillmovie.service;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import com.example.movieproject.chillmovie.DTO.MovieDTO;
-import com.example.movieproject.chillmovie.DTO.WatchHistoryDTO;
+import com.example.movieproject.chillmovie.DTO.*;
+import com.example.movieproject.chillmovie.entity.MovieType;
 import com.example.movieproject.chillmovie.entity.*;
 import com.example.movieproject.chillmovie.projection.MovieProjection;
 import com.example.movieproject.chillmovie.projection.WatchHistoryProjection;
 import com.example.movieproject.chillmovie.respository.*;
+import org.intellij.lang.annotations.Language;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.example.movieproject.chillmovie.DTO.CreateMovieRequest;
-import com.example.movieproject.chillmovie.DTO.UpdateMovieRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -26,26 +23,67 @@ public class MovieService {
     private final MovieActorRepository movieActorRepository;
     private final UserRepository userRepository;
     private final WatchHistoryRepository watchHistoryRepository;
+    private final EpisodeRepository episodeRepository;
 
-    public MovieService(MovieRepository movieRepository, MovieGenreRepository movieGenreRepository, MovieActorRepository movieActorRepository, UserRepository userRepository, WatchHistoryRepository watchHistoryRepository) {
+    public MovieService(MovieRepository movieRepository, MovieGenreRepository movieGenreRepository, MovieActorRepository movieActorRepository, UserRepository userRepository, WatchHistoryRepository watchHistoryRepository, EpisodeRepository episodeRepository) {
         this.movieRepository = movieRepository;
         this.movieGenreRepository = movieGenreRepository;
         this.movieActorRepository = movieActorRepository;
         this.userRepository = userRepository;
         this.watchHistoryRepository = watchHistoryRepository;
+        this.episodeRepository = episodeRepository;
     }
 
-    public List<Movie> getAllMovies() {
-        return movieRepository.findAll();
+    public List<MovieDTO> getAllMovies() {
+        List<Movie> movies = movieRepository.findAll();
+
+        return movies.stream().map(m -> {
+            MovieDTO dto = new MovieDTO();
+            dto.setId(m.getId());
+            dto.setTitle(m.getTitle());
+            dto.setDescription(m.getDescription());
+            dto.setDuration(m.getDuration());
+            dto.setCountry(m.getCountry());
+            dto.setLanguage(m.getLanguage());
+            dto.setAgeLimit(m.getAgeLimit());
+            dto.setTrailerUrl(m.getTrailerUrl());
+            dto.setPosterUrl(m.getPosterUrl());
+            return dto;
+        }).toList();
     }
 
 
-    public Movie getMovieByID(Long id) {
-        Optional<Movie> movieOptional = movieRepository.findById(id);// do findById trả về Optional để tránh lỗi
-        // NullPointerException khi không tìm thấy movie
-        // với id đó
-        // nếu movie tồn tại, trả về movie đó
-        return movieOptional.orElse(null);
+    public MovieDTO getMovieByID(Long id) {
+        Movie movie = movieRepository.findById(id).orElse(null);
+        MovieDTO dto = new MovieDTO();
+
+        // ===== map basic info =====
+        dto.setId(movie.getId());
+        dto.setTitle(movie.getTitle());
+        dto.setDescription(movie.getDescription());
+        dto.setDuration(movie.getDuration());
+        dto.setCountry(movie.getCountry());
+        dto.setLanguage(movie.getLanguage());
+        dto.setAgeLimit(movie.getAgeLimit());
+        dto.setTrailerUrl(movie.getTrailerUrl());
+        dto.setPosterUrl(movie.getPosterUrl());
+
+        // ===== map actors =====
+        List<String> actors = movie.getMovieActors()
+                .stream()
+                .map(ma -> ma.getActor().getName()) // nhớ đúng field name
+                .toList();
+
+        dto.setActors(actors);
+
+        // ===== map genres =====
+        List<String> genres = movie.getMovieGenres()
+                .stream()
+                .map(mg -> mg.getGenre().getName())
+                .toList();
+
+        dto.setGenres(genres);
+        return dto;
     }
 
     //Danh sách full phim kèm lịch sử bản thân
@@ -53,10 +91,6 @@ public class MovieService {
         return movieRepository.findAllMoviesWithHistory(userId);
     }
 
-    //Danh sách phim yêu thích
-    public List<Movie> getAllFavouriteMovies(Long userId) {
-        return movieRepository.findFavoriteByUserId(userId);
-    }
 
     //Lịch sử xem phim
     public List<WatchHistoryProjection> getAllHistoryMovies(Long userId) {
@@ -64,6 +98,7 @@ public class MovieService {
         return movieRepository.findHistory(userId, pageable);
     }
 
+    @Transactional
     public Movie createMovie(CreateMovieRequest request) {
 
         // 1. Lưu movie trước
@@ -76,6 +111,7 @@ public class MovieService {
         movie.setDescription(request.description);
         movie.setTrailerUrl(request.trailerUrl);
         movie.setPosterUrl(request.posterUrl);
+        movie.setType(request.type);
 
         movie = movieRepository.save(movie);
 
@@ -106,6 +142,20 @@ public class MovieService {
             ma.setRoleName(a.roleName);
 
             movieActorRepository.save(ma);
+        }
+        if (request.type == MovieType.SERIES && request.episodes != null) {
+
+            for (EpisodeRequest e : request.episodes) {
+
+                Episode episode = new Episode();
+                episode.setMovie(movie);
+                episode.setEpisodeNumber(e.episodeNumber);
+                episode.setTitle(e.title);
+                episode.setVideoUrl(e.videoUrl);
+                episode.setDuration(e.duration);
+
+                episodeRepository.save(episode);
+            }
         }
 
         return movie;
@@ -164,6 +214,26 @@ public class MovieService {
             ma.setRoleName(a.roleName);
 
             movieActorRepository.save(ma);
+        }
+        if (movie.getType() == MovieType.SERIES) {
+
+            // 1. Xóa hết episode cũ
+            episodeRepository.deleteByMovieId(movieId);
+
+            // 2. Insert lại episode mới
+            if (request.episodes != null) {
+                for (EpisodeRequest e : request.episodes) {
+
+                    Episode episode = new Episode();
+                    episode.setMovie(movie);
+                    episode.setEpisodeNumber(e.episodeNumber);
+                    episode.setTitle(e.title);
+                    episode.setVideoUrl(e.videoUrl);
+                    episode.setDuration(e.duration);
+
+                    episodeRepository.save(episode);
+                }
+            }
         }
 
         return movie;
@@ -266,5 +336,24 @@ public class MovieService {
             return dto;
         }).toList();
     }
+
+    public List<MovieDTO> findMovieByType(MovieType type) {
+        List<Movie> movies = movieRepository.findByType(type);
+
+        return movies.stream().map(m -> {
+            MovieDTO dto = new MovieDTO();
+            dto.setId(m.getId());
+            dto.setTitle(m.getTitle());
+            dto.setDescription(m.getDescription());
+            dto.setDuration(m.getDuration());
+            dto.setCountry(m.getCountry());
+            dto.setLanguage(m.getLanguage());
+            dto.setAgeLimit(m.getAgeLimit());
+            dto.setTrailerUrl(m.getTrailerUrl());
+            dto.setPosterUrl(m.getPosterUrl());
+            return dto;
+        }).toList();
+    }
+
 
 }

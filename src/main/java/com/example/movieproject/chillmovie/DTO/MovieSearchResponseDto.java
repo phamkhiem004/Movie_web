@@ -1,7 +1,12 @@
 package com.example.movieproject.chillmovie.DTO;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
+@Getter
+@Setter
 public class MovieSearchResponseDto {
     private List<MovieSearchItemDto> items;
     private int page;
@@ -15,35 +20,4 @@ public class MovieSearchResponseDto {
         this.total = total;
     }
 
-    public List<MovieSearchItemDto> getItems() {
-        return items;
-    }
-
-    public void setItems(List<MovieSearchItemDto> items) {
-        this.items = items;
-    }
-
-    public int getPage() {
-        return page;
-    }
-
-    public void setPage(int page) {
-        this.page = page;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
-    }
-
-    public long getTotal() {
-        return total;
-    }
-
-    public void setTotal(long total) {
-        this.total = total;
-    }
 }

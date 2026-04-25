@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import jakarta.persistence.*;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -42,6 +41,10 @@ public class Movie {
 
     @Column(name = "age_limit")
     private Integer ageLimit;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    private MovieType type;
 
     @OneToMany(mappedBy = "movie", fetch = FetchType.LAZY)
     private Set<MovieActor> movieActors;

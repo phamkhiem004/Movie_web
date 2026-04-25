@@ -1,5 +1,6 @@
 package com.example.movieproject.chillmovie.service;
 
+import com.example.movieproject.chillmovie.DTO.MovieDTO;
 import com.example.movieproject.chillmovie.entity.FavoriteMovie;
 import com.example.movieproject.chillmovie.entity.FavoriteMovieId;
 import com.example.movieproject.chillmovie.entity.Movie;
@@ -25,20 +26,36 @@ public class FavoriteMovieService {
         this.movieRepository = movieRepository;
     }
 
-    public List<FavoriteMovie> findAllByUserId(Long userId) {
-        return favoriteMovieRepository.findAllByUserId(userId);
+    //Danh sách phim yêu thích
+    public List<MovieDTO> getAllFavouriteMovies(Long userId) {
+        List<Movie> movies = favoriteMovieRepository.findFavoriteByUserId(userId);
+
+        return movies.stream().map(m -> {
+            MovieDTO dto = new MovieDTO();
+            dto.setId(m.getId());
+            dto.setTitle(m.getTitle());
+            dto.setDescription(m.getDescription());
+            dto.setDuration(m.getDuration());
+            dto.setCountry(m.getCountry());
+            dto.setLanguage(m.getLanguage());
+            dto.setAgeLimit(m.getAgeLimit());
+            dto.setTrailerUrl(m.getTrailerUrl());
+            dto.setPosterUrl(m.getPosterUrl());
+            return dto;
+        }).toList();
     }
 
     //Thêm phim yêu thích
     @Transactional
-    public void likeMovie(Long userId, Long movieId) {
+    public boolean likeMovie(Long userId, Long movieId) {
 
         if (favoriteMovieRepository.findByUserAndMovieId(userId, movieId).isPresent()) {
-            return;
+            return false;
         }
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new RuntimeException("Movie not found"));
 
@@ -51,12 +68,19 @@ public class FavoriteMovieService {
         favoriteMovie.setCreatedAt(Instant.now());
 
         favoriteMovieRepository.save(favoriteMovie);
+
+        return true;
     }
 
-    //Xóa phim yêu thích
     @Transactional
-    public void unlikeMovie(Long userId, Long movieId) {
+    public boolean unlikeMovie(Long userId, Long movieId) {
+
+        if (!favoriteMovieRepository.findByUserAndMovieId(userId, movieId).isPresent()) {
+            return false; // chưa like mà đòi unlike
+        }
+
         favoriteMovieRepository.deleteByUserIdAndMovieId(userId, movieId);
+        return true;
     }
 
     public boolean checkIfUserLikedMovie(Long userId, Long movieId) {

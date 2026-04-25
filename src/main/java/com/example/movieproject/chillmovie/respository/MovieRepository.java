@@ -1,29 +1,23 @@
 package com.example.movieproject.chillmovie.respository;
 
-import com.example.movieproject.chillmovie.DTO.MovieDTO;
-import com.example.movieproject.chillmovie.entity.FavoriteMovie;
+import com.example.movieproject.chillmovie.entity.MovieType;
 import com.example.movieproject.chillmovie.projection.MovieProjection;
 import com.example.movieproject.chillmovie.projection.WatchHistoryProjection;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.movieproject.chillmovie.entity.Movie;
-import org.springframework.web.bind.annotation.PathVariable;
 
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Long> {
 
-    //Tìm kiếm phim yêu thích bởi user
-    @Query("SELECT fm.movie FROM FavoriteMovie fm WHERE fm.user.id = :userId")
-    List<Movie> findFavoriteByUserId(@Param("userId") Long userId);
+
 
     @Query("""
                 SELECT DISTINCT m FROM Movie m
@@ -77,4 +71,5 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     List<WatchHistoryProjection> findHistory(@Param("userId") Long userId, Pageable pageable);
 
 
+    List<Movie> findByType(MovieType type);
 }

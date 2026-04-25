@@ -5,6 +5,7 @@ import java.util.List;
 import com.example.movieproject.chillmovie.DTO.CreateMovieRequest;
 import com.example.movieproject.chillmovie.DTO.MovieDTO;
 import com.example.movieproject.chillmovie.DTO.UpdateMovieRequest;
+import com.example.movieproject.chillmovie.entity.MovieType;
 import com.example.movieproject.chillmovie.projection.MovieProjection;
 import com.example.movieproject.chillmovie.projection.WatchHistoryProjection;
 import org.springframework.http.HttpStatus;
@@ -25,8 +26,8 @@ public class MovieController {
 
     //Hiển thị khi chưa login
     @GetMapping("/movies")
-    public ResponseEntity<List<Movie>> getAllMovies() {
-        List<Movie> movies = movieService.getAllMovies();
+    public ResponseEntity<List<MovieDTO>> getAllMovies() {
+        List<MovieDTO> movies = movieService.getAllMovies();
         return ResponseEntity.status(HttpStatus.OK).body(movies);
     }
 
@@ -37,6 +38,22 @@ public class MovieController {
         return ResponseEntity.status(HttpStatus.OK).body(movies);
     }
 
+
+    // Thông tin phim khi chưa login
+    @GetMapping("movies/{id}")
+    public ResponseEntity<MovieDTO> getMovieByID(@PathVariable Long id) {
+        MovieDTO movie = movieService.getMovieByID(id);
+        return ResponseEntity.status(HttpStatus.OK).body(movie);
+    }
+
+    //Thông tin phim khi đã login
+    @GetMapping("/movie/{id}/user/{userid}")
+    public ResponseEntity<MovieDTO> getMovieByUserID(@PathVariable Long id, @PathVariable Long userid) {
+        MovieDTO movie = movieService.getMovieDetail(id, userid);
+        return ResponseEntity.status(HttpStatus.OK).body(movie);
+    }
+
+    //Tạo mới phim
     @PostMapping("/movie/create")
     public ResponseEntity<Movie> createMovie(
             @RequestBody CreateMovieRequest request) {
@@ -46,6 +63,8 @@ public class MovieController {
 
     }
 
+
+    //Xóa phim => sau update là Unactive
     @DeleteMapping("/movies/{id}/delete")
     public ResponseEntity<Object> deleteMovie(@PathVariable Long id) throws IdInvalidException {
         if (id >= 1500) {
@@ -57,40 +76,45 @@ public class MovieController {
 
     }
 
-    @GetMapping("movies/{id}")
-    public ResponseEntity<Movie> getMovieByID(@PathVariable Long id) {
-        Movie movie = movieService.getMovieByID(id);
-        return ResponseEntity.status(HttpStatus.OK).body(movie);
-    }
 
+    //Update phim
     @PutMapping("/movies/{id}/update")
     public ResponseEntity<Movie> updateMovie(@PathVariable Long id, @RequestBody UpdateMovieRequest movie) {
         Movie updatedMovie = movieService.updateMovie(id, movie);
         return ResponseEntity.status(HttpStatus.OK).body(updatedMovie);
     }
 
+
+    //Lấy list phim theo actor
     @GetMapping("/movies/actor/{id}")
     public ResponseEntity<List<MovieDTO>> getMovieByActorID(@PathVariable Long id) {
         List<MovieDTO> movies = movieService.findMovieByActorId(id);
         return ResponseEntity.status(HttpStatus.OK).body(movies);
     }
 
+
+    //Lấy list phim theo thể loại
     @GetMapping("/movies/genre/{id}")
     public ResponseEntity<List<MovieDTO>> getMovieByGenreID(@PathVariable Long id) {
         List<MovieDTO> movies = movieService.findMovieByGenreId(id);
         return ResponseEntity.status(HttpStatus.OK).body(movies);
     }
 
-    @GetMapping("/movie/{id}/user/{userid}")
-    public ResponseEntity<MovieDTO> getMovieByUserID(@PathVariable Long id, @PathVariable Long userid) {
-        MovieDTO movie = movieService.getMovieDetail(id, userid);
-        return ResponseEntity.status(HttpStatus.OK).body(movie);
-    }
 
+    // List lịch sử xem phim của user
     @GetMapping("/recent/user/{id}")
     public ResponseEntity<List<WatchHistoryProjection>> getMovieHistoryByUser(@PathVariable Long id) {
         List<WatchHistoryProjection> history = movieService.getAllHistoryMovies(id);
         return ResponseEntity.status(HttpStatus.OK).body(history);
     }
+
+    // List phim theo phim lẻ/bộ
+    @GetMapping("/movies/type")
+    public ResponseEntity<List<MovieDTO>> getAllMoviesByType(@RequestParam MovieType type) {
+        List<MovieDTO> movies = movieService.findMovieByType(type);
+        return ResponseEntity.status(HttpStatus.OK).body(movies);
+    }
+
+
 
 }
