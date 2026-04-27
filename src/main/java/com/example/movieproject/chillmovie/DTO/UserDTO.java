@@ -19,6 +19,6 @@ public class UserDTO {
     private Long role;
     private UserStatus status;
     private Instant createdAt;
-    private String fullname;
+    private String fullName;
 
 }

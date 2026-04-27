@@ -52,7 +52,7 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     @Query("SELECT wh.movie FROM WatchHistory wh " +
             "WHERE wh.user.id = :userId " +
             "ORDER BY wh.lastWatchedAt DESC")
-    List<Movie> findRecentMovies(@Param("userId") Long userId);
+    List<Movie> findRecentMovies(@Param("userId") Long userId, Pageable pageable);
 
     @Query("SELECT " +
             "m.id as movieId, " +

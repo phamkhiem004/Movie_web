@@ -47,7 +47,7 @@ public class FavoriteMovieController {
         RestResponse<Boolean> res = new RestResponse<>();
         res.setStatusCode(200);
         res.setMessage(unliked ? " Hủy Like thành công" : "Chưa like trước đó");
-        res.setData(unliked); // Tùy chọn
+        res.setData(unliked);
 
         return ResponseEntity.ok(res);
 
@@ -59,7 +59,7 @@ public class FavoriteMovieController {
         Boolean check = favoriteMovieService.checkIfUserLikedMovie(userId, movieId);
         RestResponse<Boolean> res = new RestResponse<>();
         res.setStatusCode(200);
-        res.setMessage("Thành công");
+        res.setMessage(check ? "Đã like" : "Chưa like");
         res.setData(check);
 
         return ResponseEntity.ok(res);

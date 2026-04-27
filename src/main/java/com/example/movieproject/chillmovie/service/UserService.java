@@ -59,14 +59,23 @@ public class UserService {
         dto.setUsername(savedUser.getUsername());
         dto.setEmail(savedUser.getEmail());
         dto.setStatus(savedUser.getStatus());
-        dto.setFullname(savedUser.getFullName());
+        dto.setFullName(savedUser.getFullName());
 
         return dto;
     }
 
-    public User getUserByID(Long id) {
-        Optional<User> movieOptional = userRepository.findById(id);
-        return movieOptional.orElse(null);
+    public UserDTO getUserByID(Long id) {
+        User user = userRepository.findById(id).orElse(null);
+        UserDTO dto = new UserDTO();
+        assert user != null;
+        dto.setUserId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
+        dto.setStatus(user.getStatus());
+        dto.setFullName(user.getFullName());
+        dto.setCreatedAt(user.getCreatedAt());
+        return dto;
+
     }
 
     @Transactional
@@ -83,7 +92,7 @@ public class UserService {
         dto.setEmail(user.getEmail());
         dto.setStatus(user.getStatus());
         dto.setRole(user.getRoleId());
-        dto.setFullname(user.getFullName());
+        dto.setFullName(user.getFullName());
 
         return dto;
     }

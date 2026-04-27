@@ -355,6 +355,19 @@ public class MovieService {
             return dto;
         }).toList();
     }
+    public List<MovieDTO> find5RecentMovies(Long id, int page, int size){
+        PageRequest pageable = PageRequest.of(page, Math.min(size, 50));
+        List<Movie> movies = movieRepository.findRecentMovies(id, pageable);
+        return movies.stream().map(map->{
+            MovieDTO dto = new MovieDTO();
+            dto.setId(map.getId());
+            dto.setTitle(map.getTitle());
+            dto.setDescription(map.getDescription());
+            dto.setDuration(map.getDuration());
+            return dto;
+
+        }).toList();
+    }
 
 
 }
