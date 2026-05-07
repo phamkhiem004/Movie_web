@@ -40,7 +40,7 @@ public class MovieController {
 
 
     // Thông tin phim khi chưa login
-    @GetMapping("movies/{id}")
+    @GetMapping("/movies/{id}")
     public ResponseEntity<MovieDTO> getMovieByID(@PathVariable Long id) {
         MovieDTO movie = movieService.getMovieByID(id);
         return ResponseEntity.status(HttpStatus.OK).body(movie);
