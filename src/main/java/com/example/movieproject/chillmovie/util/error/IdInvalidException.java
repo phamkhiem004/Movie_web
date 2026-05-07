@@ -1,4 +1,4 @@
-package com.example.movieproject.chillmovie.service.error;
+package com.example.movieproject.chillmovie.util.error;
 
 public class IdInvalidException extends Exception {
     public IdInvalidException(String message) {

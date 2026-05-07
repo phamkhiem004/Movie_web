@@ -4,8 +4,10 @@ import com.example.movieproject.chillmovie.DTO.CreateUserRequest;
 import com.example.movieproject.chillmovie.DTO.UpdateUserRequest;
 import com.example.movieproject.chillmovie.DTO.UserDTO;
 import com.example.movieproject.chillmovie.entity.Movie;
+import com.example.movieproject.chillmovie.entity.Role;
 import com.example.movieproject.chillmovie.entity.User;
 import com.example.movieproject.chillmovie.entity.UserStatus;
+import com.example.movieproject.chillmovie.respository.RoleRepository;
 import com.example.movieproject.chillmovie.respository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,10 +20,12 @@ import java.util.Optional;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -33,7 +37,7 @@ public class UserService {
             userDTO.setUsername(map.getUsername());
             userDTO.setEmail(map.getEmail());
             userDTO.setStatus(map.getStatus());
-            userDTO.setRole(map.getRoleId());
+            userDTO.setRole(map.getRole().getRoleName());
             userDTO.setCreatedAt(map.getCreatedAt());
             return userDTO;
         }).toList();
@@ -51,7 +55,10 @@ public class UserService {
 
 
         user.setStatus(UserStatus.ACTIVE);
-        user.setRoleId(2L);
+        Role role = roleRepository.findById(2L)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        user.setRole(role);
 
         User savedUser = userRepository.save(user);
 
@@ -91,13 +98,15 @@ public class UserService {
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
         dto.setStatus(user.getStatus());
-        dto.setRole(user.getRoleId());
+        dto.setRole(user.getRole().getRoleName());
         dto.setFullName(user.getFullName());
 
         return dto;
     }
 
 
+    public User getUserByUserName(String username) {
+        return userRepository.findByUsername(username).orElse(null);
 
-
+    }
 }

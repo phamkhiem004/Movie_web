@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.movieproject.chillmovie.entity.Movie;
 import com.example.movieproject.chillmovie.service.MovieService;
-import com.example.movieproject.chillmovie.service.error.IdInvalidException;
+import com.example.movieproject.chillmovie.util.error.IdInvalidException;
 
 @RestController
 public class MovieController {
