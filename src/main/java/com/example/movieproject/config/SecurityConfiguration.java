@@ -106,7 +106,8 @@ public class SecurityConfiguration {
                                 "/movie/", "/movie/details/**", "movie/genre/", "movie/actor/", "movie/type",
                                 "/search/**",
                                 "/register",
-                                "/genres/**"
+                                "/genres/**",
+                                "/common/**"
 
                         ).permitAll()
                         .requestMatchers("/users").hasAnyAuthority("ROLE_ADMIN")

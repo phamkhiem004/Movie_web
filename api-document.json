@@ -269,6 +269,70 @@
                 }
             }
         },
+        "/common/send-email": {
+            "post": {
+                "tags": [
+                    "Common Controller"
+                ],
+                "operationId": "sendEmail",
+                "parameters": [
+                    {
+                        "name": "recipient",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "subject",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "content",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "files": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/actor/create": {
             "post": {
                 "tags": [
@@ -1438,14 +1502,14 @@
                             "type": "string"
                         }
                     },
-                    "tracks": {
+                    "artists": {
                         "type": "array",
                         "writeOnly": true,
                         "items": {
                             "type": "string"
                         }
                     },
-                    "artists": {
+                    "tracks": {
                         "type": "array",
                         "writeOnly": true,
                         "items": {
@@ -1533,30 +1597,30 @@
             "WatchHistoryProjection": {
                 "type": "object",
                 "properties": {
-                    "title": {
-                        "type": "string"
-                    },
-                    "posterUrl": {
-                        "type": "string"
-                    },
                     "movieId": {
                         "type": "integer",
                         "format": "int64"
                     },
-                    "episodeNumber": {
-                        "type": "integer",
-                        "format": "int32"
+                    "completed": {
+                        "type": "boolean"
                     },
                     "lastWatchedAt": {
                         "type": "string",
                         "format": "date-time"
                     },
-                    "completed": {
-                        "type": "boolean"
+                    "episodeNumber": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "posterUrl": {
+                        "type": "string"
                     },
                     "watchedSeconds": {
                         "type": "integer",
                         "format": "int32"
+                    },
+                    "title": {
+                        "type": "string"
                     },
                     "episodeId": {
                         "type": "integer",
