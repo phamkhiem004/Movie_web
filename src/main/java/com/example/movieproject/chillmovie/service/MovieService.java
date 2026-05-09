@@ -2,19 +2,16 @@ package com.example.movieproject.chillmovie.service;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 import com.example.movieproject.chillmovie.DTO.*;
 import com.example.movieproject.chillmovie.entity.MovieType;
 import com.example.movieproject.chillmovie.entity.*;
-import com.example.movieproject.chillmovie.projection.MovieProjection;
 import com.example.movieproject.chillmovie.projection.WatchHistoryProjection;
 import com.example.movieproject.chillmovie.respository.*;
-import com.example.movieproject.chillmovie.util.CustomUserDetails;
-import org.intellij.lang.annotations.Language;
+import com.example.movieproject.chillmovie.DTO.CustomUserDetails;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -61,65 +58,18 @@ public class MovieService {
     }
 
 
-    public MovieDTO getMovieByID(Long id, User user) {
-        Movie movie = movieRepository.findById(id).orElse(null);
-        MovieDTO dto = new MovieDTO();
 
-        // ===== map basic info =====
-        dto.setId(movie.getId());
-        dto.setTitle(movie.getTitle());
-        dto.setDescription(movie.getDescription());
-        dto.setDuration(movie.getDuration());
-        dto.setCountry(movie.getCountry());
-        dto.setLanguage(movie.getLanguage());
-        dto.setType(movie.getType());
-        dto.setAgeLimit(movie.getAgeLimit());
-        dto.setTrailerUrl(movie.getTrailerUrl());
-        dto.setPosterUrl(movie.getPosterUrl());
-
-        // ===== map actors =====
-        List<String> actors = movie.getMovieActors()
-                .stream()
-                .map(ma -> ma.getActor().getName()) // nhớ đúng field name
-                .toList();
-
-        dto.setActors(actors);
-
-        // ===== map genres =====
-        List<String> genres = movie.getMovieGenres()
-                .stream()
-                .map(mg -> mg.getGenre().getName())
-                .toList();
-
-        dto.setGenres(genres);
-        if (dto.getType() == MovieType.SERIES) {
-
-            List<EpisodeDTO> episodes = movie.getEpisodes()
-                    .stream()
-                    .map(e -> {
-                        EpisodeDTO ep = new EpisodeDTO();
-
-                        ep.setEpisodeNumber(e.getEpisodeNumber());
-                        ep.setTitle(e.getTitle());
-                        ep.setVideoUrl(e.getVideoUrl());
-                        ep.setDuration(e.getDuration());
-
-                        return ep;
-                    })
-                    .toList();
-
-            dto.setEpisodes(episodes);
-        }
-        return dto;
-    }
 
 
 
 
     //Lịch sử xem phim
-    public List<WatchHistoryProjection> getAllHistoryMovies(Long userId) {
+    public List<WatchHistoryProjection> getAllHistoryMovies(CustomUserDetails user) {
         Pageable pageable = PageRequest.of(0, 5);
-        return movieRepository.findHistory(userId, pageable);
+        if (user == null || user.getId() == null) {
+            throw new AccessDeniedException("Access denied");
+        }
+        return movieRepository.findHistory(user.getId(), pageable);
     }
 
     @Transactional
@@ -298,7 +248,7 @@ public class MovieService {
     // Lấy thông tin phim trả về với cả lịch sử người xem
     public MovieDTO getMovieDetail(Long movieId, CustomUserDetails user) {
 
-        System.out.println("User ID from Principal: " + user.getId());
+
         Movie movie = movieRepository.findMovieDetail(movieId)
                 .orElseThrow(() -> new RuntimeException("Movie not found"));
 

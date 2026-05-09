@@ -4,6 +4,8 @@ package com.example.movieproject.chillmovie.controller;
 import com.example.movieproject.chillmovie.DTO.GenreDTO;
 import com.example.movieproject.chillmovie.entity.Genre;
 import com.example.movieproject.chillmovie.service.GenreService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@Tag(name = "Genre Controller")
 public class GenreController {
 
     private final GenreService genreService;
@@ -18,6 +21,7 @@ public class GenreController {
         this.genreService = genreService;
     }
 
+    @Operation(summary = "Get all genres", description = "API get all genres")
     @GetMapping("/genres")
     public ResponseEntity<List<GenreDTO>> findAll() {
         List<GenreDTO> genreDTOS = genreService.findAll();

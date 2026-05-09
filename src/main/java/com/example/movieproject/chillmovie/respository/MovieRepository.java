@@ -30,16 +30,6 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
             """)
     Optional<Movie> findMovieDetail(Long movieId);
 
-    //Tìm tất cả các phim với lịch sử xem
-    @Query("SELECT " +
-            "m.id AS movieId, " +
-            "m.title AS title, " +
-            "m.posterUrl AS posterUrl, " +
-            "wh.watchedSeconds AS watchedSeconds, " +
-            "wh.completed AS completed " +
-            "FROM Movie m " +
-            "LEFT JOIN WatchHistory wh ON wh.movie = m AND wh.user.id = :userId")
-    List<MovieProjection> findAllMoviesWithHistory(@Param("userId") Long userId);
 
 
     //Tìm kiếm phim theo id Actor

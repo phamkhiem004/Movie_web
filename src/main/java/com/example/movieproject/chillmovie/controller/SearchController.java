@@ -4,13 +4,17 @@ package com.example.movieproject.chillmovie.controller;
 import com.example.movieproject.chillmovie.DTO.MovieSearchResponseDto;
 import com.example.movieproject.chillmovie.DTO.SearchSuggestionsDto;
 import com.example.movieproject.chillmovie.service.SearchService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@RequestMapping("/search")
+@Tag(name = "Search Controller")
 @RestController
 public class SearchController {
     private final SearchService movieSearchService;
@@ -21,14 +25,16 @@ public class SearchController {
 
     // 1. API GỢI Ý TÌM KIẾM TỰ ĐỘNG
     // Cách gọi: GET /search/suggestions?q=batman
-    @GetMapping("/search/suggestions")
+    @Operation(summary = "Search movie and actor ", description = "API search movie and actor by keyword")
+    @GetMapping("/suggestions")
     public SearchSuggestionsDto getSuggestions(@RequestParam(defaultValue = "") String q) {
         return movieSearchService.getSuggestions(q);
     }
 
     // 2. API TÌM KIẾM PHIM VÀ PHÂN TRANG//Search theo tên + thể loại
     // Cách gọi: GET /api/search/movies?q=a&genreIds=1,3,5&page=0&size=20
-    @GetMapping("/search/movies")
+    @Operation(summary = "Search movie", description = "Search movies with keyword and genres")
+    @GetMapping("/movies")
     public MovieSearchResponseDto searchMovies(
             @RequestParam(defaultValue = "") String q,
             @RequestParam(required = false) String genreIds, // Nhận vào chuỗi "1,2,3"

@@ -21,11 +21,13 @@
         }
     ],
     "paths": {
-        "/movie/{id}/update": {
+        "/movie/update/{id}": {
             "put": {
                 "tags": [
-                    "movie-controller"
+                    "Movie Controller"
                 ],
+                "summary": "Update movie",
+                "description": "API update movie",
                 "operationId": "updateMovie",
                 "parameters": [
                     {
@@ -63,11 +65,13 @@
                 }
             }
         },
-        "/actor/{id}/update": {
+        "/actor/update/{id}": {
             "put": {
                 "tags": [
-                    "actor-controller"
+                    "Actor Controller"
                 ],
+                "summary": "Update actor",
+                "description": "API update actor",
                 "operationId": "updateActor",
                 "parameters": [
                     {
@@ -139,8 +143,10 @@
         "/register": {
             "post": {
                 "tags": [
-                    "auth-controller"
+                    "Auth Controller"
                 ],
+                "summary": "Register",
+                "description": "API register",
                 "operationId": "register",
                 "requestBody": {
                     "content": {
@@ -169,8 +175,10 @@
         "/movie/create": {
             "post": {
                 "tags": [
-                    "movie-controller"
+                    "Movie Controller"
                 ],
+                "summary": "Create new movie",
+                "description": "Api create new movie",
                 "operationId": "createMovie",
                 "requestBody": {
                     "content": {
@@ -199,8 +207,10 @@
         "/login": {
             "post": {
                 "tags": [
-                    "auth-controller"
+                    "Auth Controller"
                 ],
+                "summary": "Login",
+                "description": "API login",
                 "operationId": "login",
                 "requestBody": {
                     "content": {
@@ -226,22 +236,15 @@
                 }
             }
         },
-        "/like/{userId}/{movieId}": {
+        "/favorite/like/{movieId}": {
             "post": {
                 "tags": [
-                    "favorite-movie-controller"
+                    "Favorite Movie Controller"
                 ],
+                "summary": "Like movie",
+                "description": "API like movie",
                 "operationId": "likeMovie",
                 "parameters": [
-                    {
-                        "name": "userId",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        }
-                    },
                     {
                         "name": "movieId",
                         "in": "path",
@@ -269,8 +272,10 @@
         "/actor/create": {
             "post": {
                 "tags": [
-                    "actor-controller"
+                    "Actor Controller"
                 ],
+                "summary": "Create new actor",
+                "description": "API create new actor",
                 "operationId": "createActor",
                 "requestBody": {
                     "content": {
@@ -436,51 +441,13 @@
                 }
             }
         },
-        "/status/{userId}/{movieId}": {
-            "get": {
-                "tags": [
-                    "favorite-movie-controller"
-                ],
-                "operationId": "checkLikeStatus",
-                "parameters": [
-                    {
-                        "name": "userId",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        }
-                    },
-                    {
-                        "name": "movieId",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/RestResponseBoolean"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/search/suggestions": {
             "get": {
                 "tags": [
-                    "search-controller"
+                    "Search Controller"
                 ],
+                "summary": "Search movie and actor ",
+                "description": "API search movie and actor by keyword",
                 "operationId": "getSuggestions",
                 "parameters": [
                     {
@@ -510,8 +477,10 @@
         "/search/movies": {
             "get": {
                 "tags": [
-                    "search-controller"
+                    "Search Controller"
                 ],
+                "summary": "Search movie",
+                "description": "Search movies with keyword and genres",
                 "operationId": "searchMovies",
                 "parameters": [
                     {
@@ -566,135 +535,13 @@
                 }
             }
         },
-        "/recent/user/{id}": {
+        "/movie/type": {
             "get": {
                 "tags": [
-                    "movie-controller"
+                    "Movie Controller"
                 ],
-                "operationId": "getMovieHistoryByUser",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/WatchHistoryProjection"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/movies": {
-            "get": {
-                "tags": [
-                    "movie-controller"
-                ],
-                "operationId": "getAllMovies",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/MovieDTO"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/movies/{id}": {
-            "get": {
-                "tags": [
-                    "movie-controller"
-                ],
-                "operationId": "getMovieByID",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "minimum": 1,
-                            "type": "integer",
-                            "format": "int64"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/MovieDTO"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/movies/user/{id}": {
-            "get": {
-                "tags": [
-                    "movie-controller"
-                ],
-                "operationId": "getMovie",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "minimum": 1,
-                            "type": "integer",
-                            "format": "int64"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/MovieProjection"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/movies/type": {
-            "get": {
-                "tags": [
-                    "movie-controller"
-                ],
+                "summary": "Get list movie by type",
+                "description": "API get list movie by type",
                 "operationId": "getAllMoviesByType",
                 "parameters": [
                     {
@@ -704,8 +551,8 @@
                         "schema": {
                             "type": "string",
                             "enum": [
-                                "single",
-                                "series"
+                                "SINGLE",
+                                "SERIES"
                             ]
                         }
                     }
@@ -727,11 +574,38 @@
                 }
             }
         },
-        "/movies/genre/{id}": {
+        "/movie/recent": {
             "get": {
                 "tags": [
-                    "movie-controller"
+                    "Movie Controller"
                 ],
+                "summary": "Get list history movie",
+                "description": "API get list history movie",
+                "operationId": "getMovieHistoryByUser",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/WatchHistoryProjection"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/movie/genre/{id}": {
+            "get": {
+                "tags": [
+                    "Movie Controller"
+                ],
+                "summary": "Get list movie by genre",
+                "description": "API get list movie by genre",
                 "operationId": "getMovieByGenreID",
                 "parameters": [
                     {
@@ -761,11 +635,47 @@
                 }
             }
         },
-        "/movies/actor/{id}": {
+        "/movie/details/{id}": {
             "get": {
                 "tags": [
-                    "movie-controller"
+                    "Movie Controller"
                 ],
+                "summary": "Get movie detail",
+                "description": "API get movie by Id",
+                "operationId": "getMovieByID",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "minimum": 1,
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MovieDTO"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/movie/actor/{id}": {
+            "get": {
+                "tags": [
+                    "Movie Controller"
+                ],
+                "summary": "Get list movie by actor",
+                "description": "API get list movie by actor",
                 "operationId": "getMovieByActorID",
                 "parameters": [
                     {
@@ -796,41 +706,24 @@
                 }
             }
         },
-        "/movie/{id}/user/{userid}": {
+        "/movie/": {
             "get": {
                 "tags": [
-                    "movie-controller"
+                    "Movie Controller"
                 ],
-                "operationId": "getMovieByUserID",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "minimum": 1,
-                            "type": "integer",
-                            "format": "int64"
-                        }
-                    },
-                    {
-                        "name": "userid",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "minimum": 1,
-                            "type": "integer",
-                            "format": "int64"
-                        }
-                    }
-                ],
+                "summary": "Get all movies",
+                "description": "Api get all movies",
+                "operationId": "getAllMovies",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/MovieDTO"
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/MovieDTO"
+                                    }
                                 }
                             }
                         }
@@ -841,8 +734,10 @@
         "/genres": {
             "get": {
                 "tags": [
-                    "genre-controller"
+                    "Genre Controller"
                 ],
+                "summary": "Get all genres",
+                "description": "API get all genres",
                 "operationId": "findAll",
                 "responses": {
                     "200": {
@@ -861,15 +756,17 @@
                 }
             }
         },
-        "/favorite/user/{id}": {
+        "/favorite/check/{movieId}": {
             "get": {
                 "tags": [
-                    "favorite-movie-controller"
+                    "Favorite Movie Controller"
                 ],
-                "operationId": "getFavoriteMoviesByUser",
+                "summary": "Check like movie",
+                "description": "API check like movie",
+                "operationId": "checkLikeStatus",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "movieId",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -878,6 +775,28 @@
                         }
                     }
                 ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RestResponseBoolean"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/favorite/": {
+            "get": {
+                "tags": [
+                    "Favorite Movie Controller"
+                ],
+                "summary": "Get list favorite movies",
+                "description": "API get all favourite movies",
+                "operationId": "getFavoriteMoviesByUser",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -895,34 +814,13 @@
                 }
             }
         },
-        "/actors": {
+        "/actor/details/{id}": {
             "get": {
                 "tags": [
-                    "actor-controller"
+                    "Actor Controller"
                 ],
-                "operationId": "getActors",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/ActorDTO"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/actor/{id}": {
-            "get": {
-                "tags": [
-                    "actor-controller"
-                ],
+                "summary": "Get actor detail",
+                "description": "API get actor detail",
                 "operationId": "getActorById",
                 "parameters": [
                     {
@@ -942,6 +840,31 @@
                             "*/*": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ActorDTO"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/actor/": {
+            "get": {
+                "tags": [
+                    "Actor Controller"
+                ],
+                "summary": "Get all actors",
+                "description": "API get all actors",
+                "operationId": "getActors",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ActorDTO"
+                                    }
                                 }
                             }
                         }
@@ -969,51 +892,13 @@
                 }
             }
         },
-        "/unlike/{userId}/{movieId}": {
+        "/movie/delete/{id}": {
             "delete": {
                 "tags": [
-                    "favorite-movie-controller"
+                    "Movie Controller"
                 ],
-                "operationId": "unlikeMovie",
-                "parameters": [
-                    {
-                        "name": "userId",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        }
-                    },
-                    {
-                        "name": "movieId",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/RestResponseBoolean"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/movie/{id}/delete": {
-            "delete": {
-                "tags": [
-                    "movie-controller"
-                ],
+                "summary": "Delete movie",
+                "description": "API delete movie",
                 "operationId": "deleteMovie",
                 "parameters": [
                     {
@@ -1034,6 +919,39 @@
                             "*/*": {
                                 "schema": {
                                     "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/favorite/unlike/{movieId}": {
+            "delete": {
+                "tags": [
+                    "Favorite Movie Controller"
+                ],
+                "summary": "Unlike movie",
+                "description": "API unlike movie",
+                "operationId": "unlikeMovie",
+                "parameters": [
+                    {
+                        "name": "movieId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RestResponseBoolean"
                                 }
                             }
                         }
@@ -1113,8 +1031,8 @@
                     "type": {
                         "type": "string",
                         "enum": [
-                            "single",
-                            "series"
+                            "SINGLE",
+                            "SERIES"
                         ]
                     },
                     "genreIds": {
@@ -1193,8 +1111,8 @@
                     "type": {
                         "type": "string",
                         "enum": [
-                            "single",
-                            "series"
+                            "SINGLE",
+                            "SERIES"
                         ]
                     },
                     "releaseDate": {
@@ -1368,8 +1286,8 @@
                     "type": {
                         "type": "string",
                         "enum": [
-                            "single",
-                            "series"
+                            "SINGLE",
+                            "SERIES"
                         ]
                     },
                     "genreIds": {
@@ -1580,12 +1498,12 @@
                     "actor_name": {
                         "type": "string"
                     },
+                    "poster_url": {
+                        "type": "string"
+                    },
                     "movie_id": {
                         "type": "integer",
                         "format": "int64"
-                    },
-                    "poster_url": {
-                        "type": "string"
                     }
                 }
             },
@@ -1615,54 +1533,32 @@
             "WatchHistoryProjection": {
                 "type": "object",
                 "properties": {
-                    "episodeId": {
-                        "type": "integer",
-                        "format": "int64"
-                    },
                     "title": {
                         "type": "string"
-                    },
-                    "lastWatchedAt": {
-                        "type": "string",
-                        "format": "date-time"
                     },
                     "posterUrl": {
                         "type": "string"
                     },
-                    "watchedSeconds": {
+                    "movieId": {
                         "type": "integer",
-                        "format": "int32"
+                        "format": "int64"
                     },
                     "episodeNumber": {
                         "type": "integer",
                         "format": "int32"
                     },
+                    "lastWatchedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
                     "completed": {
                         "type": "boolean"
-                    },
-                    "movieId": {
-                        "type": "integer",
-                        "format": "int64"
-                    }
-                }
-            },
-            "MovieProjection": {
-                "type": "object",
-                "properties": {
-                    "title": {
-                        "type": "string"
-                    },
-                    "posterUrl": {
-                        "type": "string"
                     },
                     "watchedSeconds": {
                         "type": "integer",
                         "format": "int32"
                     },
-                    "completed": {
-                        "type": "boolean"
-                    },
-                    "movieId": {
+                    "episodeId": {
                         "type": "integer",
                         "format": "int64"
                     }

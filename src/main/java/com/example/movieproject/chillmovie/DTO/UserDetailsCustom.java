@@ -29,8 +29,8 @@ public class UserDetailsCustom implements UserDetailsService {
         }
 
         // 1. Tạo đối tượng CustomUserDetails của bạn
-        com.example.movieproject.chillmovie.util.CustomUserDetails customUserDetails =
-                new com.example.movieproject.chillmovie.util.CustomUserDetails();
+        CustomUserDetails customUserDetails =
+                new CustomUserDetails();
 
         // 2. Gán các giá trị từ Entity 'user' (DB) sang 'customUserDetails'
         customUserDetails.setId(user.getId());

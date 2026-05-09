@@ -1,5 +1,6 @@
 package com.example.movieproject.chillmovie.service;
 
+import com.example.movieproject.chillmovie.DTO.CustomUserDetails;
 import com.example.movieproject.chillmovie.DTO.MovieDTO;
 import com.example.movieproject.chillmovie.entity.FavoriteMovie;
 import com.example.movieproject.chillmovie.entity.FavoriteMovieId;
@@ -27,8 +28,8 @@ public class FavoriteMovieService {
     }
 
     //Danh sách phim yêu thích
-    public List<MovieDTO> getAllFavouriteMovies(Long userId) {
-        List<Movie> movies = favoriteMovieRepository.findFavoriteByUserId(userId);
+    public List<MovieDTO> getAllFavouriteMovies(CustomUserDetails user) {
+        List<Movie> movies = favoriteMovieRepository.findFavoriteByUserId(user.getId());
 
         return movies.stream().map(m -> {
             MovieDTO dto = new MovieDTO();
@@ -47,23 +48,23 @@ public class FavoriteMovieService {
 
     //Thêm phim yêu thích
     @Transactional
-    public boolean likeMovie(Long userId, Long movieId) {
+    public boolean likeMovie(CustomUserDetails user, Long movieId) {
 
-        if (favoriteMovieRepository.findByUserAndMovieId(userId, movieId).isPresent()) {
+        if (favoriteMovieRepository.findByUserAndMovieId(user.getId(), movieId).isPresent()) {
             return false;
         }
 
-        User user = userRepository.findById(userId)
+        User u = userRepository.findById(user.getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new RuntimeException("Movie not found"));
 
-        FavoriteMovieId favoriteMovieId = new FavoriteMovieId(userId, movieId);
+        FavoriteMovieId favoriteMovieId = new FavoriteMovieId(user.getId(), movieId);
 
         FavoriteMovie favoriteMovie = new FavoriteMovie();
         favoriteMovie.setId(favoriteMovieId);
-        favoriteMovie.setUser(user);
+        favoriteMovie.setUser(u);
         favoriteMovie.setMovie(movie);
         favoriteMovie.setCreatedAt(Instant.now());
 
@@ -73,18 +74,18 @@ public class FavoriteMovieService {
     }
 
     @Transactional
-    public boolean unlikeMovie(Long userId, Long movieId) {
+    public boolean unlikeMovie(CustomUserDetails user, Long movieId) {
 
-        if (!favoriteMovieRepository.findByUserAndMovieId(userId, movieId).isPresent()) {
+        if (!favoriteMovieRepository.findByUserAndMovieId(user.getId(), movieId).isPresent()) {
             return false; // chưa like mà đòi unlike
         }
 
-        favoriteMovieRepository.deleteByUserIdAndMovieId(userId, movieId);
+        favoriteMovieRepository.deleteByUserIdAndMovieId(user.getId(), movieId);
         return true;
     }
 
-    public boolean checkIfUserLikedMovie(Long userId, Long movieId) {
-        return favoriteMovieRepository.checkIfUserLikedMovie(userId, movieId);
+    public boolean checkIfUserLikedMovie(CustomUserDetails user, Long movieId) {
+        return favoriteMovieRepository.checkIfUserLikedMovie(user.getId(), movieId);
     }
 
 

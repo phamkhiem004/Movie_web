@@ -7,6 +7,8 @@ import com.example.movieproject.chillmovie.DTO.RegisterDTO;
 import com.example.movieproject.chillmovie.DTO.ResLoginDTO;
 import com.example.movieproject.chillmovie.service.UserService;
 import com.example.movieproject.chillmovie.util.SecurityUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
+@Tag(name = "Auth Controller")
 @RestController
 public class AuthController {
 
@@ -32,6 +34,7 @@ public class AuthController {
         this.userService = userService;
     }
 
+    @Operation(summary = "Login", description = "API login")
     @PostMapping("/login")
     public ResponseEntity<ResLoginDTO> login(@Valid @RequestBody LoginDTO loginDTO) {
 
@@ -47,6 +50,7 @@ public class AuthController {
         return ResponseEntity.ok().body(resLoginDTO);
     }
 
+    @Operation(summary = "Register", description = "API register")
     @PostMapping("register")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<RegisterDTO> register(@Valid @RequestBody CreateUserRequest user) {

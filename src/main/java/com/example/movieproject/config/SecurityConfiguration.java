@@ -101,13 +101,22 @@ public class SecurityConfiguration {
 
                         .requestMatchers(
                                 "/",
-                                "/login",
-                                "/movies/**",
+                                "/login", "/register",
+                                "/actor/", "/actor/details/**",
+                                "/movie/", "/movie/details/**", "movie/genre/", "movie/actor/", "movie/type",
                                 "/search/**",
                                 "/register",
                                 "/genres/**"
+
                         ).permitAll()
                         .requestMatchers("/users").hasAnyAuthority("ROLE_ADMIN")
+                        .requestMatchers(
+                                "movie/create", "movie/update/", "movie/delete/",
+                                "actor/create", "actor/update/"
+
+
+                        ).hasAnyAuthority("ROLE-ADMIN")
+                        .requestMatchers("/favorite/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
 
                         .anyRequest().authenticated()
 
