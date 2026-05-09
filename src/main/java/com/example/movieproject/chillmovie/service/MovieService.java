@@ -1,5 +1,6 @@
 package com.example.movieproject.chillmovie.service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,9 +10,11 @@ import com.example.movieproject.chillmovie.entity.*;
 import com.example.movieproject.chillmovie.projection.MovieProjection;
 import com.example.movieproject.chillmovie.projection.WatchHistoryProjection;
 import com.example.movieproject.chillmovie.respository.*;
+import com.example.movieproject.chillmovie.util.CustomUserDetails;
 import org.intellij.lang.annotations.Language;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -58,7 +61,7 @@ public class MovieService {
     }
 
 
-    public MovieDTO getMovieByID(Long id) {
+    public MovieDTO getMovieByID(Long id, User user) {
         Movie movie = movieRepository.findById(id).orElse(null);
         MovieDTO dto = new MovieDTO();
 
@@ -110,10 +113,7 @@ public class MovieService {
         return dto;
     }
 
-    //Danh sách full phim kèm lịch sử bản thân
-    public List<MovieProjection> getALlMovieWithHistory(Long userId) {
-        return movieRepository.findAllMoviesWithHistory(userId);
-    }
+
 
 
     //Lịch sử xem phim
@@ -296,13 +296,11 @@ public class MovieService {
     }
 
     // Lấy thông tin phim trả về với cả lịch sử người xem
-    public MovieDTO getMovieDetail(Long movieId, Long userId) {
-        Movie movie = movieRepository.findMovieDetail(movieId).orElseThrow(() -> new RuntimeException("Movie not found"));
-        List<WatchHistory> histories = watchHistoryRepository.findWatchHistory(movieId, userId);
+    public MovieDTO getMovieDetail(Long movieId, CustomUserDetails user) {
 
-        if (movie == null) {
-            return null;
-        }
+        System.out.println("User ID from Principal: " + user.getId());
+        Movie movie = movieRepository.findMovieDetail(movieId)
+                .orElseThrow(() -> new RuntimeException("Movie not found"));
 
         MovieDTO dto = new MovieDTO();
 
@@ -318,60 +316,63 @@ public class MovieService {
         dto.setTrailerUrl(movie.getTrailerUrl());
         dto.setPosterUrl(movie.getPosterUrl());
 
-        // ===== map actors =====
-        List<String> actors = movie.getMovieActors()
-                .stream()
-                .map(ma -> ma.getActor().getName()) // nhớ đúng field name
-                .toList();
+        // ===== actors =====
+        dto.setActors(
+                movie.getMovieActors()
+                        .stream()
+                        .map(ma -> ma.getActor().getName())
+                        .toList()
+        );
 
-        dto.setActors(actors);
+        // ===== genres =====
+        dto.setGenres(
+                movie.getMovieGenres()
+                        .stream()
+                        .map(mg -> mg.getGenre().getName())
+                        .toList()
+        );
 
-        // ===== map genres =====
-        List<String> genres = movie.getMovieGenres()
-                .stream()
-                .map(mg -> mg.getGenre().getName())
-                .toList();
-
-        dto.setGenres(genres);
-
-        if (dto.getType() == MovieType.SERIES) {
-
-            List<EpisodeDTO> episodes = movie.getEpisodes()
-                    .stream()
-                    .map(e -> {
-                        EpisodeDTO ep = new EpisodeDTO();
-
-                        ep.setEpisodeNumber(e.getEpisodeNumber());
-                        ep.setTitle(e.getTitle());
-                        ep.setVideoUrl(e.getVideoUrl());
-                        ep.setDuration(e.getDuration());
-
-                        return ep;
-                    })
-                    .toList();
-
-            dto.setEpisodes(episodes);
+        // ===== episodes =====
+        if (movie.getType() == MovieType.SERIES) {
+            dto.setEpisodes(
+                    movie.getEpisodes()
+                            .stream()
+                            .map(e -> {
+                                EpisodeDTO ep = new EpisodeDTO();
+                                ep.setEpisodeNumber(e.getEpisodeNumber());
+                                ep.setTitle(e.getTitle());
+                                ep.setVideoUrl(e.getVideoUrl());
+                                ep.setDuration(e.getDuration());
+                                return ep;
+                            })
+                            .toList()
+            );
         }
 
-        // ===== map continueWatching =====
-        WatchHistory latest = histories.stream()
-                .filter(h -> h.getLastWatchedAt() != null) // tránh null
-                .max((a, b) -> a.getLastWatchedAt().compareTo(b.getLastWatchedAt()))
-                .orElse(null);
+        // ===== watch history (CHỈ KHI LOGIN) =====
+        if (user != null) {
 
-        if (latest != null) {
-            WatchHistoryDTO historyDTO = new WatchHistoryDTO();
+            List<WatchHistory> histories =
+                    watchHistoryRepository.findWatchHistory(movieId, user.getId());
 
-            // check episode null (phim lẻ)
-            if (latest.getEpisode() != null) {
-                historyDTO.setEpisodeId(latest.getEpisode().getId());
+            WatchHistory latest = histories.stream()
+                    .filter(h -> h.getLastWatchedAt() != null) // tránh null
+                    .max(Comparator.comparing(WatchHistory::getLastWatchedAt))
+                    .orElse(null);
+
+            if (latest != null) {
+                WatchHistoryDTO historyDTO = new WatchHistoryDTO();
+
+                if (latest.getEpisode() != null) {
+                    historyDTO.setEpisodeId(latest.getEpisode().getId());
+                }
+
+                historyDTO.setWatchedSeconds(latest.getWatchedSeconds());
+                historyDTO.setCompleted(latest.getCompleted());
+                historyDTO.setLastWatchedAt(latest.getLastWatchedAt());
+
+                dto.setContinueWatching(historyDTO);
             }
-
-            historyDTO.setWatchedSeconds(latest.getWatchedSeconds());
-            historyDTO.setCompleted(latest.getCompleted());
-            historyDTO.setLastWatchedAt(latest.getLastWatchedAt());
-
-            dto.setContinueWatching(historyDTO);
         }
 
         return dto;

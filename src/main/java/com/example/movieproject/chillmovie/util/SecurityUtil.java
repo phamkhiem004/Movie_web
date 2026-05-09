@@ -44,14 +44,27 @@ public class SecurityUtil {
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
+        Long userId = null;
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof CustomUserDetails) {
+            userId = ((CustomUserDetails) principal).getId();
+        }
+
+
+
+
+        // Sau đó mới đưa vào claim
+        assert userId != null;
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuedAt(now)
                 .expiresAt(validity)
                 .subject(authentication.getName())
+                .claim("userId", userId)
                 .claim("roles", roles)
                 .build();
         JwsHeader jwsHeader = JwsHeader.with(JWT_AlGORITHM).build();
-        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader,claims)).getTokenValue();
+        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
 
 
     }

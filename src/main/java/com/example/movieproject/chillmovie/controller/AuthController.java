@@ -1,16 +1,21 @@
 package com.example.movieproject.chillmovie.controller;
 
 
+import com.example.movieproject.chillmovie.DTO.CreateUserRequest;
 import com.example.movieproject.chillmovie.DTO.LoginDTO;
+import com.example.movieproject.chillmovie.DTO.RegisterDTO;
 import com.example.movieproject.chillmovie.DTO.ResLoginDTO;
+import com.example.movieproject.chillmovie.service.UserService;
 import com.example.movieproject.chillmovie.util.SecurityUtil;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -19,10 +24,12 @@ public class AuthController {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final SecurityUtil securityUtil;
+    private final UserService userService;
 
-    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil) {
+    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil, UserService userService) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.securityUtil = securityUtil;
+        this.userService = userService;
     }
 
     @PostMapping("/login")
@@ -38,5 +45,13 @@ public class AuthController {
         ResLoginDTO resLoginDTO = new ResLoginDTO();
         resLoginDTO.setToken(access_token);
         return ResponseEntity.ok().body(resLoginDTO);
+    }
+
+    @PostMapping("register")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<RegisterDTO> register(@Valid @RequestBody CreateUserRequest user) {
+        RegisterDTO u = this.userService.createUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(u);
+
     }
 }

@@ -1,6 +1,7 @@
-package com.example.movieproject.chillmovie.service;
+package com.example.movieproject.chillmovie.DTO;
 
 import com.example.movieproject.chillmovie.entity.User;
+import com.example.movieproject.chillmovie.service.UserService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,13 +28,21 @@ public class UserDetailsCustom implements UserDetailsService {
             throw new UsernameNotFoundException("Username/password không hợp lệ");
         }
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                Collections.singletonList(
-                        new SimpleGrantedAuthority("ROLE_" + user.getRole().getRoleName())
-                )
-        );
+        // 1. Tạo đối tượng CustomUserDetails của bạn
+        com.example.movieproject.chillmovie.util.CustomUserDetails customUserDetails =
+                new com.example.movieproject.chillmovie.util.CustomUserDetails();
 
+        // 2. Gán các giá trị từ Entity 'user' (DB) sang 'customUserDetails'
+        customUserDetails.setId(user.getId());
+        customUserDetails.setUsername(user.getUsername());
+        customUserDetails.setPassword(user.getPassword());
+
+        // 3. Gán quyền (Role)
+        customUserDetails.setAuthorities(Collections.singletonList(
+                new SimpleGrantedAuthority("ROLE_" + user.getRole().getRoleName())
+        ));
+
+        // 4. Trả về đối tượng custom này
+        return customUserDetails;
     }
 }

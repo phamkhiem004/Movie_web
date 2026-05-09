@@ -6,18 +6,23 @@ import com.example.movieproject.chillmovie.DTO.CreateMovieRequest;
 import com.example.movieproject.chillmovie.DTO.MovieDTO;
 import com.example.movieproject.chillmovie.DTO.UpdateMovieRequest;
 import com.example.movieproject.chillmovie.entity.MovieType;
+import com.example.movieproject.chillmovie.entity.User;
 import com.example.movieproject.chillmovie.projection.MovieProjection;
 import com.example.movieproject.chillmovie.projection.WatchHistoryProjection;
+import com.example.movieproject.chillmovie.util.CustomUserDetails;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.movieproject.chillmovie.entity.Movie;
 import com.example.movieproject.chillmovie.service.MovieService;
 import com.example.movieproject.chillmovie.util.error.IdInvalidException;
 
+@RequestMapping("/movie")
 @RestController
 public class MovieController {
     private final MovieService movieService;
@@ -27,36 +32,34 @@ public class MovieController {
     }
 
     //Hiển thị khi chưa login
-    @GetMapping("/movies")
+    @GetMapping("/")
     public ResponseEntity<List<MovieDTO>> getAllMovies() {
         List<MovieDTO> movies = movieService.getAllMovies();
         return ResponseEntity.status(HttpStatus.OK).body(movies);
     }
 
-    //Hiển thị khi đã login
-    @GetMapping("/movies/user/{id}")
-    public ResponseEntity<List<MovieProjection>> getMovie(@PathVariable @Min(value = 1,message = "User Id must be greater than 0") Long id) throws IdInvalidException {
-        List<MovieProjection> movies = movieService.getALlMovieWithHistory(id);
-        return ResponseEntity.status(HttpStatus.OK).body(movies);
-    }
 
 
-    // Thông tin phim khi chưa login
-    @GetMapping("/movies/{id}")
-    public ResponseEntity<MovieDTO> getMovieByID(@PathVariable @Min(value = 1,message = "Movie Id must be greater than 0") Long id) {
-        MovieDTO movie = movieService.getMovieByID(id);
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<MovieDTO> getMovieByID(@PathVariable @Min(value = 1,message = "Movie Id must be greater than 0") Long id,
+                                                 @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt) {
+        CustomUserDetails user = null;
+        if (jwt != null) {
+            user = new CustomUserDetails();
+            // Lấy "userId" từ claim mà bạn đã đặt trong SecurityUtil
+            Long userId = jwt.getClaim("userId");
+            user.setId(userId);
+        }
+        MovieDTO movie = movieService.getMovieDetail(id, user);
         return ResponseEntity.status(HttpStatus.OK).body(movie);
     }
 
-    //Thông tin phim khi đã login
-    @GetMapping("/movie/{id}/user/{userid}")
-    public ResponseEntity<MovieDTO> getMovieByUserID(@PathVariable @Min(value = 1,message = "Movie Id must be greater than 1") Long id, @PathVariable @Min(value = 1,message = "User Id must be greater than 1") Long userid) {
-        MovieDTO movie = movieService.getMovieDetail(id, userid);
-        return ResponseEntity.status(HttpStatus.OK).body(movie);
-    }
+
 
     //Tạo mới phim
-    @PostMapping("/movie/create")
+    @PostMapping("/create")
     public ResponseEntity<MovieDTO> createMovie(
             @Valid @RequestBody CreateMovieRequest request) {
 
@@ -67,7 +70,7 @@ public class MovieController {
 
 
     //Xóa phim => sau update là Unactive
-    @DeleteMapping("/movie/{id}/delete")
+    @DeleteMapping("/{id}/delete")
     public ResponseEntity<Object> deleteMovie(@PathVariable @Min(value = 1,message = "Movie Id must be greater than 0") Long id) throws IdInvalidException {
         if (id >= 1500) {
             throw new IdInvalidException("ID must be less than 1500");
@@ -80,7 +83,7 @@ public class MovieController {
 
 
     //Update phim
-    @PutMapping("/movie/{id}/update")
+    @PutMapping("/{id}/update")
     public ResponseEntity<MovieDTO> updateMovie(@PathVariable @Min(value = 1,message = "Movie Id must be greater than 0") Long id, @Valid @RequestBody UpdateMovieRequest movie) {
         MovieDTO updatedMovie = movieService.updateMovie(id, movie);
         return ResponseEntity.status(HttpStatus.OK).body(updatedMovie);
@@ -88,7 +91,7 @@ public class MovieController {
 
 
     //Lấy list phim theo actor
-    @GetMapping("/movies/actor/{id}")
+    @GetMapping("/actor/{id}")
     public ResponseEntity<List<MovieDTO>> getMovieByActorID(@PathVariable @Min(value = 1,message = "Actor Id must be greater than 0") Long id) {
         List<MovieDTO> movies = movieService.findMovieByActorId(id);
         return ResponseEntity.status(HttpStatus.OK).body(movies);
@@ -96,7 +99,7 @@ public class MovieController {
 
 
     //Lấy list phim theo thể loại
-    @GetMapping("/movies/genre/{id}")
+    @GetMapping("/genre/{id}")
     public ResponseEntity<List<MovieDTO>> getMovieByGenreID(@PathVariable Long id) {
         List<MovieDTO> movies = movieService.findMovieByGenreId(id);
         return ResponseEntity.status(HttpStatus.OK).body(movies);
@@ -111,7 +114,7 @@ public class MovieController {
     }
 
     // List phim theo phim lẻ/bộ
-    @GetMapping("/movies/type")
+    @GetMapping("/type")
     public ResponseEntity<List<MovieDTO>> getAllMoviesByType(@RequestParam MovieType type) {
         List<MovieDTO> movies = movieService.findMovieByType(type);
         return ResponseEntity.status(HttpStatus.OK).body(movies);
