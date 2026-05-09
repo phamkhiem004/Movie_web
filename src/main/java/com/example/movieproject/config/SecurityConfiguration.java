@@ -92,7 +92,21 @@ public class SecurityConfiguration {
 
                 // 2. Cho phép tất cả các request đi qua mà không cần xác thực
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/movies/**").permitAll()
+                        .requestMatchers(
+                                "/v3/api-docs",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                "/",
+                                "/login",
+                                "/movies/**",
+                                "/search/**",
+                                "/register",
+                                "/genres/**"
+                        ).permitAll()
                         .requestMatchers("/users").hasAnyAuthority("ROLE_ADMIN")
 
                         .anyRequest().authenticated()

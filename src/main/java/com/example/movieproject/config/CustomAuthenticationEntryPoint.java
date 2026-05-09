@@ -10,7 +10,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
@@ -26,12 +26,14 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        this.delegate.commence(request, response, authException);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=UTF-8");
-        RestResponse<Object> res = new RestResponse<Object>();
-        res.setStatusCode(HttpStatus.UNAUTHORIZED.value());
-        res.setError(authException.getCause().getMessage());
-        res.setMessage("Token không hợp lệ hoặc đã hết hạn");
+
+        RestResponse<Object> res = new RestResponse<>();
+        res.setStatusCode(401);
+        res.setError(authException.getClass().getSimpleName());
+        res.setMessage(authException.getMessage());
+
         objectMapper.writeValue(response.getWriter(), res);
 
     }

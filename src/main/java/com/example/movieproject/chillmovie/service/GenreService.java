@@ -18,7 +18,7 @@ public class GenreService {
         List<Genre> genres = genreRepository.findAll();
         return genres.stream().map(m ->{
             GenreDTO genreDTO = new GenreDTO();
-            genreDTO.setId(m.getId());
+            genreDTO.setId(m.getGenreId());
             genreDTO.setName(m.getName());
             return genreDTO;
         }).toList();

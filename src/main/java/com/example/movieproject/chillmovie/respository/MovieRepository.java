@@ -13,6 +13,7 @@ import com.example.movieproject.chillmovie.entity.Movie;
 
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Long> {
@@ -27,7 +28,7 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
                 LEFT JOIN FETCH mg.genre
                 WHERE m.id = :movieId
             """)
-    Movie findMovieDetail(Long movieId);
+    Optional<Movie> findMovieDetail(Long movieId);
 
     //Tìm tất cả các phim với lịch sử xem
     @Query("SELECT " +

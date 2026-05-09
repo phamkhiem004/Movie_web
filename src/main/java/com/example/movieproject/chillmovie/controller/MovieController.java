@@ -8,6 +8,8 @@ import com.example.movieproject.chillmovie.DTO.UpdateMovieRequest;
 import com.example.movieproject.chillmovie.entity.MovieType;
 import com.example.movieproject.chillmovie.projection.MovieProjection;
 import com.example.movieproject.chillmovie.projection.WatchHistoryProjection;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +35,7 @@ public class MovieController {
 
     //Hiển thị khi đã login
     @GetMapping("/movies/user/{id}")
-    public ResponseEntity<List<MovieProjection>> getMovie(@PathVariable Long id) throws IdInvalidException {
+    public ResponseEntity<List<MovieProjection>> getMovie(@PathVariable @Min(value = 1,message = "User Id must be greater than 0") Long id) throws IdInvalidException {
         List<MovieProjection> movies = movieService.getALlMovieWithHistory(id);
         return ResponseEntity.status(HttpStatus.OK).body(movies);
     }
@@ -41,32 +43,32 @@ public class MovieController {
 
     // Thông tin phim khi chưa login
     @GetMapping("/movies/{id}")
-    public ResponseEntity<MovieDTO> getMovieByID(@PathVariable Long id) {
+    public ResponseEntity<MovieDTO> getMovieByID(@PathVariable @Min(value = 1,message = "Movie Id must be greater than 0") Long id) {
         MovieDTO movie = movieService.getMovieByID(id);
         return ResponseEntity.status(HttpStatus.OK).body(movie);
     }
 
     //Thông tin phim khi đã login
     @GetMapping("/movie/{id}/user/{userid}")
-    public ResponseEntity<MovieDTO> getMovieByUserID(@PathVariable Long id, @PathVariable Long userid) {
+    public ResponseEntity<MovieDTO> getMovieByUserID(@PathVariable @Min(value = 1,message = "Movie Id must be greater than 1") Long id, @PathVariable @Min(value = 1,message = "User Id must be greater than 1") Long userid) {
         MovieDTO movie = movieService.getMovieDetail(id, userid);
         return ResponseEntity.status(HttpStatus.OK).body(movie);
     }
 
     //Tạo mới phim
     @PostMapping("/movie/create")
-    public ResponseEntity<Movie> createMovie(
-            @RequestBody CreateMovieRequest request) {
+    public ResponseEntity<MovieDTO> createMovie(
+            @Valid @RequestBody CreateMovieRequest request) {
 
-        Movie createdMovie = this.movieService.createMovie(request);
+        MovieDTO createdMovie = this.movieService.createMovie(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdMovie);
 
     }
 
 
     //Xóa phim => sau update là Unactive
-    @DeleteMapping("/movies/{id}/delete")
-    public ResponseEntity<Object> deleteMovie(@PathVariable Long id) throws IdInvalidException {
+    @DeleteMapping("/movie/{id}/delete")
+    public ResponseEntity<Object> deleteMovie(@PathVariable @Min(value = 1,message = "Movie Id must be greater than 0") Long id) throws IdInvalidException {
         if (id >= 1500) {
             throw new IdInvalidException("ID must be less than 1500");
         }
@@ -78,16 +80,16 @@ public class MovieController {
 
 
     //Update phim
-    @PutMapping("/movies/{id}/update")
-    public ResponseEntity<Movie> updateMovie(@PathVariable Long id, @RequestBody UpdateMovieRequest movie) {
-        Movie updatedMovie = movieService.updateMovie(id, movie);
+    @PutMapping("/movie/{id}/update")
+    public ResponseEntity<MovieDTO> updateMovie(@PathVariable @Min(value = 1,message = "Movie Id must be greater than 0") Long id, @Valid @RequestBody UpdateMovieRequest movie) {
+        MovieDTO updatedMovie = movieService.updateMovie(id, movie);
         return ResponseEntity.status(HttpStatus.OK).body(updatedMovie);
     }
 
 
     //Lấy list phim theo actor
     @GetMapping("/movies/actor/{id}")
-    public ResponseEntity<List<MovieDTO>> getMovieByActorID(@PathVariable Long id) {
+    public ResponseEntity<List<MovieDTO>> getMovieByActorID(@PathVariable @Min(value = 1,message = "Actor Id must be greater than 0") Long id) {
         List<MovieDTO> movies = movieService.findMovieByActorId(id);
         return ResponseEntity.status(HttpStatus.OK).body(movies);
     }

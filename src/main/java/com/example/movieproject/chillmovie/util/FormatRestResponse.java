@@ -1,6 +1,6 @@
 package com.example.movieproject.chillmovie.util;
 
-import org.jspecify.annotations.Nullable;
+
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.ServerHttpRequest;
@@ -20,6 +20,15 @@ public class FormatRestResponse implements ResponseBodyAdvice {
     public Object beforeBodyWrite(Object body, MethodParameter returnType,
             MediaType selectedContentType, Class selectedConvertType,
             ServerHttpRequest request, ServerHttpResponse response) {
+
+        String path = request.getURI().getPath();
+
+        // BỎ QUA SWAGGER
+        if (path.startsWith("/v3/api-docs")
+                || path.startsWith("/swagger-ui")) {
+            return body;
+        }
+
         HttpServletResponse servletResponse = ((ServletServerHttpResponse) response).getServletResponse();
         int status = servletResponse.getStatus();
 

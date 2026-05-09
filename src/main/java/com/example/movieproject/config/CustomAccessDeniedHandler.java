@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
@@ -28,8 +28,8 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType("application/json;charset=UTF-8");
         RestResponse<Object> res = new RestResponse<Object>();
         res.setStatusCode(HttpStatus.FORBIDDEN.value());
-        res.setError(accessDeniedException.getMessage());
-        res.setMessage("Bạn không có quyền truy cập");
+        res.setError("FORBIDDEN");
+        res.setMessage("Bạn không có quyền truy cập API này");
         objectMapper.writeValue(response.getWriter(), res);
 
 

@@ -1,7 +1,9 @@
 package com.example.movieproject.chillmovie.util.error;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
@@ -41,6 +43,34 @@ public class GlobalException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
 
 
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<RestResponse<Object>> handleJsonParseError(
+            HttpMessageNotReadableException ex) {
+
+        RestResponse<Object> res = new RestResponse<>();
+
+        String message = "Request body không hợp lệ";
+
+        Throwable cause = ex.getCause();
+
+        if (cause instanceof InvalidFormatException invalidFormatException) {
+
+            Class<?> targetType = invalidFormatException.getTargetType();
+
+            // kiểm tra nếu lỗi enum MovieType
+            if (targetType.isEnum()) {
+
+                message = "Type must be SINGLE or SERIES";
+            }
+        }
+
+        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        res.setMessage(message);
+        res.setError("Invalid Enum value");
+
+        return ResponseEntity.badRequest().body(res);
     }
 
 }

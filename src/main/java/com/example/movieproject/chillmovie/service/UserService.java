@@ -1,6 +1,7 @@
 package com.example.movieproject.chillmovie.service;
 
 import com.example.movieproject.chillmovie.DTO.CreateUserRequest;
+import com.example.movieproject.chillmovie.DTO.RegisterDTO;
 import com.example.movieproject.chillmovie.DTO.UpdateUserRequest;
 import com.example.movieproject.chillmovie.DTO.UserDTO;
 import com.example.movieproject.chillmovie.entity.Movie;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +37,7 @@ public class UserService {
             UserDTO userDTO = new UserDTO();
             userDTO.setUserId(map.getId());
             userDTO.setUsername(map.getUsername());
+            userDTO.setFullName(map.getFullName());
             userDTO.setEmail(map.getEmail());
             userDTO.setStatus(map.getStatus());
             userDTO.setRole(map.getRole().getRoleName());
@@ -44,7 +47,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO createUser(CreateUserRequest request) {
+    public RegisterDTO createUser(CreateUserRequest request) {
 
         User user = new User();
         user.setUsername(request.username);
@@ -62,10 +65,9 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
 
-        UserDTO dto = new UserDTO();
+        RegisterDTO dto = new RegisterDTO();
         dto.setUsername(savedUser.getUsername());
         dto.setEmail(savedUser.getEmail());
-        dto.setStatus(savedUser.getStatus());
         dto.setFullName(savedUser.getFullName());
 
         return dto;
@@ -95,11 +97,15 @@ public class UserService {
         }
 
         UserDTO dto = new UserDTO();
+        dto.setUserId(user.getId());
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
         dto.setStatus(user.getStatus());
         dto.setRole(user.getRole().getRoleName());
         dto.setFullName(user.getFullName());
+        dto.setCreatedAt(user.getCreatedAt());
+        dto.setUpdatedAt(Instant.now());
+
 
         return dto;
     }

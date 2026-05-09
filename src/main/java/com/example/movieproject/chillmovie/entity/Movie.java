@@ -5,7 +5,11 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 import jakarta.persistence.*;
+
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -47,9 +51,11 @@ public class Movie {
     private MovieType type;
 
     @OneToMany(mappedBy = "movie", fetch = FetchType.LAZY)
-    private Set<MovieActor> movieActors;
+    private Set<MovieActor> movieActors = new HashSet<>();
 
     @OneToMany(mappedBy = "movie", fetch = FetchType.LAZY)
-    private Set<MovieGenre> movieGenres;
+    private Set<MovieGenre> movieGenres = new HashSet<>();
+    @OneToMany(mappedBy = "movie", fetch = FetchType.LAZY)
+    private List<Episode> episodes = new ArrayList<>();
 
 }
