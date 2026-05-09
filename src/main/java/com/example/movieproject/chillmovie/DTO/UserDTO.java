@@ -2,6 +2,7 @@ package com.example.movieproject.chillmovie.DTO;
 
 import com.example.movieproject.chillmovie.entity.UserStatus;
 import com.example.movieproject.chillmovie.util.EnumPattern;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {
+
+
     private Long userId;
 
     @NotNull(message = "Username can't be null")

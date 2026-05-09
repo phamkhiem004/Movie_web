@@ -8,6 +8,7 @@ import com.example.movieproject.chillmovie.entity.Movie;
 import com.example.movieproject.chillmovie.entity.User;
 import com.example.movieproject.chillmovie.entity.UserStatus;
 import com.example.movieproject.chillmovie.service.UserService;
+import com.example.movieproject.config.Translator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -55,20 +56,20 @@ public class UserController {
 
     @PatchMapping("/user/{id}/active")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<UserDTO> activeUser(@PathVariable @Min(value = 1, message = "Id must be  greater than 1") Long id) {
+    public ResponseEntity<UserDTO> activeUser(@PathVariable @Min(value = 1) Long id) {
         return ResponseEntity.ok(userService.updateUserStatus(id, UserStatus.ACTIVE));
     }
 
     @PatchMapping("/user/{id}/block")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<UserDTO> blockUser(@PathVariable @Min(value = 1, message = "Id must be  greater than 1") Long id) {
+    public ResponseEntity<UserDTO> blockUser(@PathVariable @Min(value = 1) Long id) {
         return ResponseEntity.ok(userService.updateUserStatus(id, UserStatus.BLOCKED));
     }
 
 
     @GetMapping("/user/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<UserDTO> getUserById(@PathVariable @Min(value = 1, message = "Id must be  greater than 1") Long id) {
+    public ResponseEntity<UserDTO> getUserById(@PathVariable @Min(value = 1) Long id) {
         UserDTO user = userService.getUserByID(id);
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
