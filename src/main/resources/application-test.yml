@@ -1,0 +1,31 @@
+server:
+  port: 8081
+
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+        database-platform: org.hibernate.dialect.H2Dialect
+        hibernate:
+          ddl-auto: create-drop
+
+
+open:
+  api:
+    serverUrl: http://localhost:${server.port}
+    serverName: server test
+    title: API Document
+    version: 1.0.0
+
+khiem:
+  jwt:
+    base64-secret: "day_la_mot_chuoi_bi_mat_gia_co_do_dai_du_lon_de_chay_pass_qua_moi_truong_test_nhanh_chong"
+
+#.\mvnw clean package
+# java -jar target/demo-0.0.1-SNAPSHOT.jar --spring.profiles.active=test

@@ -1,0 +1,31 @@
+server:
+  port: 8082
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/movie_project
+    username: root
+    password: ${DB_PASSWORD}
+  config:
+    activate:
+      on-profile: prod
+  mail:
+    username: anucius1@gmail.com
+    password: ${MAIL_PASSWORD}
+open:
+  api:
+    serverUrl: http://localhost:${server.port}
+    serverName: server prod
+    title: API Document
+    version: 1.0.0
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+
+
+khiem:
+  jwt:
+    base64-secret: ${JWT_SECRET}

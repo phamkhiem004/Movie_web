@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/movie_project
+    username: root
+    password: ${DB_PASSWORD}
+  config:
+    activate:
+      on-profile: dev
+  mail:
+    username: anucius1@gmail.com
+    password: ${MAIL_PASSWORD}
+open:
+  api:
+    serverUrl: http://localhost:${server.port}
+    serverName: server dev
+    title: API Document
+    version: 1.0.0
+
+
+
+khiem:
+  jwt:
+    base64-secret: ${JWT_SECRET}
+#.\mvnw clean package -P dev -DskipTests
+# java -jar target/demo-0.0.1-SNAPSHOT.jar
