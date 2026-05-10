@@ -48,6 +48,9 @@ public class User {
     @Column(name = "created_at")
     private Instant createdAt;
 
+    @Column(name = "secret_code")
+    private String secretCode;
+
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "updated_at")
     private Instant updatedAt;

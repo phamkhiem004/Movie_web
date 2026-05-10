@@ -107,7 +107,8 @@ public class SecurityConfiguration {
                                 "/search/**",
                                 "/register",
                                 "/genres/**",
-                                "/common/**"
+                                "/common/**",
+                                "/confirm/**"
 
                         ).permitAll()
                         .requestMatchers("/users").hasAnyAuthority("ROLE_ADMIN")

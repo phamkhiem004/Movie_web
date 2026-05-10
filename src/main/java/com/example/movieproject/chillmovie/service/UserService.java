@@ -10,6 +10,9 @@ import com.example.movieproject.chillmovie.entity.User;
 import com.example.movieproject.chillmovie.entity.UserStatus;
 import com.example.movieproject.chillmovie.respository.RoleRepository;
 import com.example.movieproject.chillmovie.respository.UserRepository;
+import jakarta.mail.MessagingException;
+import jakarta.validation.constraints.Min;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,17 +21,22 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
+
+@Slf4j
 @Service
 public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MailService mailService;
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, MailService mailService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.mailService = mailService;
     }
 
     public List<UserDTO> findAllUsers() {
@@ -47,7 +55,7 @@ public class UserService {
     }
 
     @Transactional
-    public RegisterDTO createUser(CreateUserRequest request) {
+    public RegisterDTO createUser(CreateUserRequest request) throws MessagingException {
 
         User user = new User();
         user.setUsername(request.username);
@@ -57,13 +65,19 @@ public class UserService {
         user.setCreatedAt(request.createdAt);
 
 
-        user.setStatus(UserStatus.ACTIVE);
+        user.setStatus(UserStatus.INACTIVE);
         Role role = roleRepository.findById(2L)
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
         user.setRole(role);
+        String generatedSecretCode = UUID.randomUUID().toString();
+        user.setSecretCode(generatedSecretCode);
 
         User savedUser = userRepository.save(user);
+        if(user.getId() != null) {
+            //Send email confirm here
+            mailService.sendConfirmLink(user.getEmail(), user.getId(),generatedSecretCode);
+        }
 
         RegisterDTO dto = new RegisterDTO();
         dto.setUsername(savedUser.getUsername());
@@ -113,6 +127,25 @@ public class UserService {
 
     public User getUserByUserName(String username) {
         return userRepository.findByUsername(username).orElse(null);
+
+    }
+
+    @Transactional
+    public void confirmUser(@Min(1) String userId, String secretCode) {
+        log.info("Confirm User {}, secretCode ={} ", userId, secretCode);
+        User user = userRepository.findById(Long.valueOf(userId))
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy tài khoản với ID này!"));
+        if (user.getStatus() == UserStatus.ACTIVE) {
+            throw new RuntimeException("Tài khoản này đã được xác thực trước đó!");
+        }
+        if (user.getSecretCode() == null || !user.getSecretCode().equals(secretCode)) {
+            throw new RuntimeException("Mã xác thực không hợp lệ hoặc đã hết hạn!");
+        }
+        user.setStatus(UserStatus.ACTIVE);
+        user.setSecretCode(null);
+        userRepository.save(user);
+
+        log.info("Kích hoạt thành công tài khoản: {}", user.getUsername());
 
     }
 }

@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,7 @@ public class UserController {
     @Operation(summary = "Add user", description = "Api create new user")
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<RegisterDTO> createUser(@Valid @RequestBody CreateUserRequest user) {
+    public ResponseEntity<RegisterDTO> createUser(@Valid @RequestBody CreateUserRequest user) throws MessagingException {
         RegisterDTO u = this.userService.createUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(u);
 
