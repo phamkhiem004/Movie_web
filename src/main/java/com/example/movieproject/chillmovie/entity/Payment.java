@@ -3,6 +3,7 @@ package com.example.movieproject.chillmovie.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -34,6 +35,7 @@ public class Payment {
     @Column(name = "transaction_code", length = 150)
     private String transactionCode;
 
+    @CreationTimestamp
     @Column(name = "paid_at")
     private Instant paidAt;
 

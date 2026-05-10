@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 
@@ -27,17 +28,16 @@ public class Subscription {
     @Column(name = "end_date", nullable = false)
     private Instant endDate;
 
-    @ColumnDefault("'ACTIVE'")
-    @Lob
-    @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 20)
+    private SubscriptionStatus status = SubscriptionStatus.ACTIVE;
 
     @ColumnDefault("1")
     @Column(name = "auto_renew")
     private Boolean autoRenew;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private Instant createdAt;
 
 }

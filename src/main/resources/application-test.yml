@@ -1,5 +1,5 @@
-server:
-  port: 8081
+#server:
+#  port: 8081
 
 spring:
   config:
@@ -18,7 +18,7 @@ spring:
 
 open:
   api:
-    serverUrl: http://localhost:${server.port}
+    serverUrl: http://localhost:8081
     serverName: server test
     title: API Document
     version: 1.0.0

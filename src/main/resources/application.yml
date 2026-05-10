@@ -1,43 +1,9 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: movie-chill-app
   profiles:
     active: @spring.profiles.active@
 
-#---
-#
-#spring:
-#  config:
-#    activate:
-#      on-profile: dev
-#openapi:
-#  service:
-#    api-docs: api-service
-#    server: http://localhost:8080
-#    title: API Document
-#    version: 1.0.0
-#
-#---
-#
-#spring:
-#  config:
-#    activate:
-#      on-profile: test
-#openapi:
-#  service:
-#    api-docs: api-service
-#    server: http://localhost:8081
-#    title: API Document
-#    version: 1.0.0
-#
-#---
-#spring:
-#  config:
-#    activate:
-#      on-profile: prod
-#openapi:
-#  service:
-#    api-docs: api-service
-#    server: http://localhost:8082
-#    title: API Document
-#    version: 1.0.0
