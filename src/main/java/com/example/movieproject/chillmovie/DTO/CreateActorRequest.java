@@ -1,16 +1,21 @@
 package com.example.movieproject.chillmovie.DTO;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
+
+@Getter
+@Setter
 public class CreateActorRequest {
 
     @NotBlank(message = "Name can't be null'")
-    public String name;
-    public LocalDate birthDate;
-    public String nationality;
-    public String bio;
-    public String avatarUrl;
+    private String name;
+    private LocalDate birthDate;
+    private String nationality;
+    private String bio;
+    private String avatarUrl;
 
 }

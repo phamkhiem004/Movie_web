@@ -43,8 +43,16 @@ public class Movie {
 
     private String language;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private MovieStatus status;
+
     @Column(name = "age_limit")
     private Integer ageLimit;
+
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type")

@@ -18,6 +18,7 @@ import java.util.Optional;
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Long> {
 
+    List<Movie> findByIsDeletedFalse();
 
 
     @Query("""
@@ -29,7 +30,6 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
                 WHERE m.id = :movieId
             """)
     Optional<Movie> findMovieDetail(Long movieId);
-
 
 
     //Tìm kiếm phim theo id Actor
@@ -45,20 +45,24 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
             "ORDER BY wh.lastWatchedAt DESC")
     List<Movie> findRecentMovies(@Param("userId") Long userId, Pageable pageable);
 
-    @Query("SELECT " +
-            "m.id as movieId, " +
-            "m.title as title, " +
-            "m.posterUrl as posterUrl, " +
-            "e.id as episodeId, " +
-            "e.episodeNumber as episodeNumber, " +
-            "wh.watchedSeconds as watchedSeconds, " +
-            "wh.completed as completed, " +
-            "wh.lastWatchedAt as lastWatchedAt " +
-            "FROM WatchHistory wh " +
-            "JOIN wh.movie m " +
-            "LEFT JOIN Episode e ON wh.episode.id = e.id " +
-            "WHERE wh.user.id = :userId " +
-            "ORDER BY wh.lastWatchedAt DESC")
+    @Query("""
+                SELECT
+                    m.id as movieId,
+                    m.title as title,
+                    m.posterUrl as posterUrl,
+                    e.id as episodeId,
+                    e.episodeNumber as episodeNumber,
+                    wh.watchedSeconds as watchedSeconds,
+                    wh.completed as completed,
+                    wh.lastWatchedAt as lastWatchedAt
+                FROM WatchHistory wh
+                JOIN wh.movie m
+                LEFT JOIN Episode e ON wh.episode.id = e.id
+                WHERE wh.user.id = :userId
+                AND m.isDeleted = false
+                AND (e.isDeleted = false OR e IS NULL)
+                ORDER BY wh.lastWatchedAt DESC
+            """)
     List<WatchHistoryProjection> findHistory(@Param("userId") Long userId, Pageable pageable);
 
 

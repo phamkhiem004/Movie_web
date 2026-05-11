@@ -24,13 +24,23 @@ public class ActorController {
         this.actorService = actorService;
     }
 
-    @Operation(summary = "Get all actors", description = "API get all actors")
+    @Operation(summary = "Get all actors for user", description = "API get all actors for user")
     @GetMapping("/")
     public ResponseEntity<List<ActorDTO>> getActors() {
         List<ActorDTO> actors = actorService.getAllActors();
         return ResponseEntity.ok(actors);
 
     }
+
+    @Operation(summary = "Get all actors for admin", description = "API get all actors for admin")
+    @GetMapping("/admin/")
+    public ResponseEntity<List<ActorDTO>> getActorsAdmin() {
+        List<ActorDTO> actors = actorService.getAllActorsAdmin();
+        return ResponseEntity.ok(actors);
+
+    }
+
+
 
     @Operation(summary = "Get actor detail", description = "API get actor detail")
     @GetMapping("/details/{id}")

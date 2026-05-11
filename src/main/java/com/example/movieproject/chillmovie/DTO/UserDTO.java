@@ -36,4 +36,7 @@ public class UserDTO {
     @NotNull(message = "Fullname can't be null")
     private String fullName;
 
+    private Boolean isDeleted;
+
+
 }

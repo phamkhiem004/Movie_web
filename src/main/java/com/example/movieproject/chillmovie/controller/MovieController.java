@@ -31,7 +31,7 @@ public class MovieController {
     }
 
 
-    @Operation(summary = "Get all movies", description = "Api get all movies")
+    @Operation(summary = "Get all movies for user", description = "Api get all movies")
     @GetMapping("/")
     public ResponseEntity<List<MovieDTO>> getAllMovies() {
         List<MovieDTO> movies = movieService.getAllMovies();
@@ -39,12 +39,17 @@ public class MovieController {
     }
 
 
-
+    @Operation(summary = "Get all movies for admin", description = "Api get all movies for admin dashboard")
+    @GetMapping("/admin")
+    public ResponseEntity<List<MovieDTO>> getAdminMovies() {
+        List<MovieDTO> movies = movieService.getAdminMovies();
+        return ResponseEntity.status(HttpStatus.OK).body(movies);
+    }
 
 
     @Operation(summary = "Get movie detail", description = "API get movie by Id")
     @GetMapping("/details/{id}")
-    public ResponseEntity<MovieDTO> getMovieByID(@PathVariable @Min(value = 1,message = "Movie Id must be greater than 0") Long id,
+    public ResponseEntity<MovieDTO> getMovieByID(@PathVariable @Min(value = 1, message = "Movie Id must be greater than 0") Long id,
                                                  @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt) {
         CustomUserDetails user = null;
         if (jwt != null) {
@@ -58,7 +63,6 @@ public class MovieController {
     }
 
 
-
     @Operation(summary = "Create new movie", description = "Api create new movie")
     @PostMapping("/create")
     public ResponseEntity<MovieDTO> createMovie(
@@ -70,22 +74,9 @@ public class MovieController {
     }
 
 
-    @Operation(summary = "Delete movie", description = "API delete movie")
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> deleteMovie(@PathVariable @Min(value = 1,message = "Movie Id must be greater than 0") Long id) throws IdInvalidException {
-        if (id >= 1500) {
-            throw new IdInvalidException("ID must be less than 1500");
-        }
-
-        movieService.deleteMovie(id);
-        return ResponseEntity.ok().body(java.util.Map.of("message", "Movie deleted successfully"));
-
-    }
-
-
     @Operation(summary = "Update movie", description = "API update movie")
     @PutMapping("/update/{id}")
-    public ResponseEntity<MovieDTO> updateMovie(@PathVariable @Min(value = 1,message = "Movie Id must be greater than 0") Long id, @Valid @RequestBody UpdateMovieRequest movie) {
+    public ResponseEntity<MovieDTO> updateMovie(@PathVariable @Min(value = 1, message = "Movie Id must be greater than 0") Long id, @Valid @RequestBody UpdateMovieRequest movie) {
         MovieDTO updatedMovie = movieService.updateMovie(id, movie);
         return ResponseEntity.status(HttpStatus.OK).body(updatedMovie);
     }
@@ -93,7 +84,7 @@ public class MovieController {
 
     @Operation(summary = "Get list movie by actor", description = "API get list movie by actor")
     @GetMapping("/actor/{id}")
-    public ResponseEntity<List<MovieDTO>> getMovieByActorID(@PathVariable @Min(value = 1,message = "Actor Id must be greater than 0") Long id) {
+    public ResponseEntity<List<MovieDTO>> getMovieByActorID(@PathVariable @Min(value = 1, message = "Actor Id must be greater than 0") Long id) {
         List<MovieDTO> movies = movieService.findMovieByActorId(id);
         return ResponseEntity.status(HttpStatus.OK).body(movies);
     }

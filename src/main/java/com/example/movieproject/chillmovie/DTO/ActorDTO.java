@@ -18,5 +18,6 @@ public class ActorDTO {
     private String nationality;
     private String bio;
     private String avatarUrl;
+    private Boolean isDeleted;
 
 }

@@ -9,10 +9,23 @@ services:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./movie_project.sql:/docker-entrypoint-initdb.d/movie_project.sql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
       retries: 10
+
+  redis:
+    image: redis:6.2-alpine
+    container_name: redis
+    hostname: redis
+    ports:
+      - '6379:6379'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB;FLUSHALL
+    networks:
+      - backend
 
   movie-api:
     build: .
@@ -43,3 +56,6 @@ services:
 
 volumes:
   mysql_data:
+networks:
+  backend:
+    driver: bridge

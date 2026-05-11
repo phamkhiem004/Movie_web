@@ -24,6 +24,14 @@ public class GenreController {
     @Operation(summary = "Get all genres", description = "API get all genres")
     @GetMapping("/genres")
     public ResponseEntity<List<GenreDTO>> findAll() {
+        List<GenreDTO> genreDTOS = genreService.findAllGenres();
+        return ResponseEntity.ok().body(genreDTOS);
+    }
+
+
+    @Operation(summary = "Get all genres for admin", description = "API get all genres for admin")
+    @GetMapping("/genres/admin")
+    public ResponseEntity<List<GenreDTO>> findAllByIsDeletedFalse() {
         List<GenreDTO> genreDTOS = genreService.findAll();
         return ResponseEntity.ok().body(genreDTOS);
     }

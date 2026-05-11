@@ -1,8 +1,14 @@
 package com.example.movieproject.chillmovie.DTO;
 
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class EpisodeRequest {
-    public Integer episodeNumber;
-    public String title;
-    public String videoUrl;
-    public Integer duration;
+    private Integer episodeNumber;
+    private String title;
+    private String videoUrl;
+    private Integer duration;
 }

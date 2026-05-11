@@ -12,17 +12,17 @@ import java.time.Instant;
 @Setter
 public class CreateUserRequest {
     @NotBlank(message = "Username can't be null")
-    public String username;
+    private String username;
 
     @Email(message = "Email not valid")
     @NotBlank(message = "Email can't be null")
-    public String email;
+    private String email;
 
     @NotBlank(message = "Password can't be null")
-    public String password;
+    private String password;
 
     @NotBlank(message = "Full name can't be null")
-    public String fullName;
+    private String fullName;
 
-    public Instant createdAt;
+    private Instant createdAt;
 }

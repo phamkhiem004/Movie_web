@@ -14,7 +14,21 @@ public class GenreService {
         this.genreRepository = genreRepository;
     }
 
+
+    // Chỉ hiển thị cho user
     public List<GenreDTO> findAll() {
+        List<Genre> genres = genreRepository.findAllByIsDeletedFalse();
+        return genres.stream().map(m ->{
+            GenreDTO genreDTO = new GenreDTO();
+            genreDTO.setId(m.getGenreId());
+            genreDTO.setName(m.getName());
+            return genreDTO;
+        }).toList();
+
+    }
+
+    //Hiển thị cho admin
+    public List<GenreDTO> findAllGenres() {
         List<Genre> genres = genreRepository.findAll();
         return genres.stream().map(m ->{
             GenreDTO genreDTO = new GenreDTO();

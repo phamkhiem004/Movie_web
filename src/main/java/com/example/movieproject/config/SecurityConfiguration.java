@@ -113,8 +113,9 @@ public class SecurityConfiguration {
                         ).permitAll()
                         .requestMatchers("/users").hasAnyAuthority("ROLE_ADMIN")
                         .requestMatchers(
-                                "movie/create", "movie/update/", "movie/delete/",
-                                "actor/create", "actor/update/"
+                                "movie/create", "movie/update/", "movie/delete/", "/movie/admin",
+                                "actor/create", "actor/update/", "actor/admin/",
+                                "genres/admin"
 
 
                         ).hasAnyAuthority("ROLE-ADMIN")

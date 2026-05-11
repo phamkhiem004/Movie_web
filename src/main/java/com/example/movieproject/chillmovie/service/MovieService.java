@@ -38,6 +38,7 @@ public class MovieService {
         this.episodeRepository = episodeRepository;
     }
 
+    //Chỉ hiển thị cho user xem
     public List<MovieDTO> getAllMovies() {
         List<Movie> movies = movieRepository.findAll();
 
@@ -57,10 +58,26 @@ public class MovieService {
         }).toList();
     }
 
+    //Hiển thị ở dashboard admin
+    public List<MovieDTO> getAdminMovies() {
+        List<Movie> movies = movieRepository.findByIsDeletedFalse();
 
-
-
-
+        return movies.stream().map(m -> {
+            MovieDTO dto = new MovieDTO();
+            dto.setId(m.getId());
+            dto.setTitle(m.getTitle());
+            dto.setDescription(m.getDescription());
+            dto.setDuration(m.getDuration());
+            dto.setCountry(m.getCountry());
+            dto.setLanguage(m.getLanguage());
+            dto.setAgeLimit(m.getAgeLimit());
+            dto.setTrailerUrl(m.getTrailerUrl());
+            dto.setIsDeleted(m.getIsDeleted());
+            dto.setPosterUrl(m.getPosterUrl());
+            dto.setReleaseDate(m.getReleaseDate());
+            return dto;
+        }).toList();
+    }
 
 
     //Lịch sử xem phim
@@ -77,22 +94,24 @@ public class MovieService {
 
         // 1. Lưu movie trước
         Movie movie = new Movie();
-        movie.setTitle(request.title);
-        movie.setDuration(request.duration);
-        movie.setLanguage(request.language);
-        movie.setCountry(request.country);
-        movie.setAgeLimit(request.ageLimit);
-        movie.setDescription(request.description);
-        movie.setTrailerUrl(request.trailerUrl);
-        movie.setPosterUrl(request.posterUrl);
-        movie.setType(request.type);
+        movie.setTitle(request.getTitle());
+        movie.setDuration(request.getDuration());
+        movie.setLanguage(request.getLanguage());
+        movie.setCountry(request.getCountry());
+        movie.setAgeLimit(request.getAgeLimit());
+        movie.setDescription(request.getDescription());
+        movie.setTrailerUrl(request.getTrailerUrl());
+        movie.setPosterUrl(request.getPosterUrl());
+        movie.setType(request.getType());
+        movie.setStatus(request.getMovieStatus());
+        movie.setIsDeleted(false);
 
         movie = movieRepository.save(movie);
 
         // 2. Lưu genres (movie_genres)
-        for (Integer genreId : request.genreIds) {
-            Genre genre = genreRepository.findById(Long.valueOf(genreId))
-                    .orElseThrow(() -> new RuntimeException("Genre not found"));
+        for (Integer genreId : request.getGenreIds()) {
+            Genre genre = genreRepository.findByGenreIdAndIsDeletedFalse(genreId)
+                    .orElseThrow(() -> new RuntimeException("Genre not found or not valid with ID " + genreId));
 
             MovieGenre mg = new MovieGenre();
 
@@ -110,9 +129,9 @@ public class MovieService {
         }
 
         // 3. Lưu actors (movie_actors)
-        for (CreateMovieRequest.ActorRequest a : request.actors) {
-            Actor actor = actorRepository.findById(a.actorId)
-                    .orElseThrow(() -> new RuntimeException("Actor not found"));
+        for (CreateMovieRequest.ActorRequest a : request.getActors()) {
+            Actor actor = actorRepository.findByIdAndIsDeletedFalse(a.actorId)
+                    .orElseThrow(() -> new RuntimeException("Actor not found or not valid ID " + a.actorId));
             MovieActor ma = new MovieActor();
 
             MovieActorId id = new MovieActorId();
@@ -129,16 +148,16 @@ public class MovieService {
 
             movie.getMovieActors().add(savedMa);
         }
-        if (request.type == MovieType.SERIES && request.episodes != null) {
+        if (request.getType() == MovieType.SERIES && request.getEpisodes() != null) {
 
-            for (EpisodeRequest e : request.episodes) {
+            for (EpisodeRequest e : request.getEpisodes()) {
 
                 Episode episode = new Episode();
                 episode.setMovie(movie);
-                episode.setEpisodeNumber(e.episodeNumber);
-                episode.setTitle(e.title);
-                episode.setVideoUrl(e.videoUrl);
-                episode.setDuration(e.duration);
+                episode.setEpisodeNumber(e.getEpisodeNumber());
+                episode.setTitle(e.getTitle());
+                episode.setVideoUrl(e.getVideoUrl());
+                episode.setDuration(e.getDuration());
 
                 Episode savedMe = episodeRepository.save(episode);
                 movie.getEpisodes().add(savedMe);
@@ -151,10 +170,7 @@ public class MovieService {
         return convertToMovieDTO(savedMovie);
     }
 
-    @Transactional
-    public void deleteMovie(Long id) {
-        movieRepository.deleteById(id);
-    }
+
 
     @Transactional
     public MovieDTO updateMovie(Long movieId, UpdateMovieRequest request) {
@@ -163,15 +179,17 @@ public class MovieService {
                 .orElseThrow(() -> new RuntimeException("Movie not found"));
 
 
-        movie.setTitle(request.title);
-        movie.setDescription(request.description);
-        movie.setTrailerUrl(request.trailerUrl);
-        movie.setPosterUrl(request.posterUrl);
-        movie.setDuration(request.duration);
-        movie.setLanguage(request.language);
-        movie.setCountry(request.country);
-        movie.setAgeLimit(request.ageLimit);
-        movie.setType(request.type);
+        movie.setTitle(request.getTitle());
+        movie.setDescription(request.getDescription());
+        movie.setTrailerUrl(request.getTrailerUrl());
+        movie.setPosterUrl(request.getPosterUrl());
+        movie.setDuration(request.getDuration());
+        movie.setLanguage(request.getLanguage());
+        movie.setCountry(request.getCountry());
+        movie.setAgeLimit(request.getAgeLimit());
+        movie.setType(request.getType());
+        movie.setStatus(request.getMovieStatus());
+        movie.setIsDeleted(request.getIsDeleted());
 
         movieRepository.save(movie);
 
@@ -179,9 +197,9 @@ public class MovieService {
         movieGenreRepository.deleteByMovieId(movieId);
         movieGenreRepository.flush();
 
-        for (Integer genreId : request.genreIds) {
-            Genre genre = genreRepository.findById(Long.valueOf(genreId))
-                    .orElseThrow(() -> new RuntimeException("Genre not found"));
+        for (Integer genreId : request.getGenreIds()) {
+            Genre genre = genreRepository.findByGenreIdAndIsDeletedFalse(genreId)
+                    .orElseThrow(() -> new RuntimeException("Genre not found or not valid with ID " + genreId));
             MovieGenre mg = new MovieGenre();
 
             MovieGenreId id = new MovieGenreId();
@@ -200,9 +218,9 @@ public class MovieService {
         movieActorRepository.flush();
 
 
-        for (UpdateMovieRequest.ActorRequest a : request.actors) {
-            Actor actor = actorRepository.findById(a.actorId)
-                    .orElseThrow(() -> new RuntimeException("Actor not found"));
+        for (UpdateMovieRequest.ActorRequest a : request.getActors()) {
+            Actor actor = actorRepository.findByIdAndIsDeletedFalse(a.actorId)
+                    .orElseThrow(() -> new RuntimeException("Actor not found or not valid ID " + a.actorId));
 
             MovieActor ma = new MovieActor();
 
@@ -226,15 +244,15 @@ public class MovieService {
             episodeRepository.flush();
 
             // 2. Insert lại episode mới
-            if (request.episodes != null) {
-                for (EpisodeRequest e : request.episodes) {
+            if (request.getEpisodes() != null) {
+                for (EpisodeRequest e : request.getEpisodes()) {
 
                     Episode episode = new Episode();
                     episode.setMovie(movie);
-                    episode.setEpisodeNumber(e.episodeNumber);
-                    episode.setTitle(e.title);
-                    episode.setVideoUrl(e.videoUrl);
-                    episode.setDuration(e.duration);
+                    episode.setEpisodeNumber(e.getEpisodeNumber());
+                    episode.setTitle(e.getTitle());
+                    episode.setVideoUrl(e.getVideoUrl());
+                    episode.setDuration(e.getDuration());
 
                     episodeRepository.save(episode);
                 }
@@ -270,6 +288,7 @@ public class MovieService {
         dto.setActors(
                 movie.getMovieActors()
                         .stream()
+                        .filter(ma -> !ma.getActor().getIsDeleted())
                         .map(ma -> ma.getActor().getName())
                         .toList()
         );
@@ -278,6 +297,7 @@ public class MovieService {
         dto.setGenres(
                 movie.getMovieGenres()
                         .stream()
+                        .filter(ma -> !ma.getGenre().getIsDeleted())
                         .map(mg -> mg.getGenre().getName())
                         .toList()
         );
@@ -287,6 +307,7 @@ public class MovieService {
             dto.setEpisodes(
                     movie.getEpisodes()
                             .stream()
+                            .filter(e -> !e.getIsDeleted())
                             .map(e -> {
                                 EpisodeDTO ep = new EpisodeDTO();
                                 ep.setEpisodeNumber(e.getEpisodeNumber());
@@ -400,32 +421,32 @@ public class MovieService {
 
         MovieDTO res = new MovieDTO();
 
-        res.id = movie.getId();
-        res.title = movie.getTitle();
-        res.description = movie.getDescription();
-        res.trailerUrl = movie.getTrailerUrl();
-        res.posterUrl = movie.getPosterUrl();
-        res.duration = movie.getDuration();
-        res.releaseDate = movie.getReleaseDate();
-        res.country = movie.getCountry();
-        res.language = movie.getLanguage();
-        res.ageLimit = movie.getAgeLimit();
-        res.type = movie.getType();
+        res.setId(movie.getId());
+        res.setTitle(movie.getTitle());
+        res.setDescription(movie.getDescription());
+        res.setTrailerUrl(movie.getTrailerUrl());
+        res.setPosterUrl(movie.getPosterUrl());
+        res.setDuration(movie.getDuration());
+        res.setReleaseDate(movie.getReleaseDate());
+        res.setCountry(movie.getCountry());
+        res.setLanguage(movie.getLanguage());
+        res.setAgeLimit(movie.getAgeLimit());
+        res.setType(movie.getType());
 
         // genres
-        res.genres = movie.getMovieGenres()
+        res.setGenres(movie.getMovieGenres()
                 .stream()
                 .map(mg -> mg.getGenre().getName())
-                .toList();
+                .toList());
 
         // actors
-        res.actors = movie.getMovieActors()
+        res.setActors(movie.getMovieActors()
                 .stream()
                 .map(ma -> ma.getActor().getName()) // nhớ đúng field name
-                .toList();
+                .toList());
 
         // episodes
-        res.episodes = movie.getEpisodes()
+        res.setEpisodes(movie.getEpisodes()
                 .stream()
                 .map(e -> {
 
@@ -438,7 +459,7 @@ public class MovieService {
 
                     return er;
                 })
-                .toList();
+                .toList());
 
         return res;
     }

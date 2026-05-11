@@ -32,4 +32,7 @@ public class Actor {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
 }

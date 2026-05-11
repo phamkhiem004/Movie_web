@@ -14,8 +14,8 @@ import lombok.Setter;
 public class LoginDTO {
 
     @NotBlank(message = "username không được để trống")
-    public String username;
+    private String username;
 
     @NotBlank(message = "password không được để trống")
-    public String password;
+    private String password;
 }

@@ -37,6 +37,9 @@ public class Episode {
     @Column(name = "duration")
     private Integer duration;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;

@@ -2,7 +2,6 @@ package com.example.movieproject.chillmovie.service;
 
 import com.example.movieproject.chillmovie.DTO.CreateUserRequest;
 import com.example.movieproject.chillmovie.DTO.RegisterDTO;
-import com.example.movieproject.chillmovie.DTO.UpdateUserRequest;
 import com.example.movieproject.chillmovie.DTO.UserDTO;
 import com.example.movieproject.chillmovie.entity.Movie;
 import com.example.movieproject.chillmovie.entity.Role;
@@ -58,11 +57,12 @@ public class UserService {
     public RegisterDTO createUser(CreateUserRequest request) throws MessagingException {
 
         User user = new User();
-        user.setUsername(request.username);
-        user.setEmail(request.email);
-        user.setPassword(passwordEncoder.encode(request.password));
-        user.setFullName(request.fullName);
-        user.setCreatedAt(request.createdAt);
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setFullName(request.getFullName());
+        user.setIsDeleted(false);
+        user.setCreatedAt(request.getCreatedAt());
 
 
         user.setStatus(UserStatus.INACTIVE);
@@ -96,6 +96,7 @@ public class UserService {
         dto.setEmail(user.getEmail());
         dto.setStatus(user.getStatus());
         dto.setFullName(user.getFullName());
+        dto.setIsDeleted(user.getIsDeleted());
         dto.setCreatedAt(user.getCreatedAt());
         return dto;
 

@@ -46,6 +46,10 @@ public class User {
     private UserStatus status;
 
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;

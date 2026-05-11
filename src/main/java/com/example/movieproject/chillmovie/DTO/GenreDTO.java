@@ -12,5 +12,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class GenreDTO {
     private Integer id;
-    public String name;
+    private String name;
 }

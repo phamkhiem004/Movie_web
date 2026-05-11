@@ -23,8 +23,9 @@ public class ActorService {
     }
 
 
+    //User lấy thông tin Actor
     public ActorDTO getActorById(@PathVariable Long id) {
-        Actor actor = actorRepository.findById(id).orElse(null);
+        Actor actor = actorRepository.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new RuntimeException("User not found or not valid"));
         ActorDTO actorDTO = new ActorDTO();
         assert actor != null;
         actorDTO.setId(actor.getId());
@@ -40,25 +41,29 @@ public class ActorService {
 
     public ActorDTO createActor(CreateActorRequest request) {
         Actor actor = new Actor();
-        actor.setName(request.name);
-        actor.setNationality(request.nationality);
-        actor.setBirthDate(request.birthDate);
-        actor.setBiography(request.bio);
-        actor.setAvatarUrl(request.avatarUrl);
+        actor.setName(request.getName());
+        actor.setNationality(request.getNationality());
+        actor.setBirthDate(request.getBirthDate());
+        actor.setBiography(request.getBio());
+        actor.setAvatarUrl(request.getAvatarUrl());
+        actor.setIsDeleted(false);
         actorRepository.save(actor);
 
         ActorDTO actorDTO = new ActorDTO();
+        actorDTO.setId(actor.getId());
         actorDTO.setName(actor.getName());
         actorDTO.setBirthDate(actor.getBirthDate());
         actorDTO.setNationality(actor.getNationality());
         actorDTO.setBio(actor.getBiography());
         actorDTO.setAvatarUrl(actor.getAvatarUrl());
+        actorDTO.setIsDeleted(actor.getIsDeleted());
         return actorDTO;
     }
 
-    public List<ActorDTO> getAllActors(){
-        List<Actor> actors = actorRepository.findAll();
-        return actors.stream().map( map ->{
+    // Cho user
+    public List<ActorDTO> getAllActors() {
+        List<Actor> actors = actorRepository.findByIsDeletedFalse();
+        return actors.stream().map(map -> {
             ActorDTO dto = new ActorDTO();
             dto.setId(map.getId());
             dto.setName(map.getName());
@@ -68,17 +73,33 @@ public class ActorService {
             return dto;
         }).toList();
     }
+
+    //Cho admin
+    public List<ActorDTO> getAllActorsAdmin() {
+        List<Actor> actors = actorRepository.findAll();
+        return actors.stream().map(map -> {
+            ActorDTO dto = new ActorDTO();
+            dto.setId(map.getId());
+            dto.setName(map.getName());
+            dto.setBirthDate(map.getBirthDate());
+            dto.setBio(map.getBiography());
+            dto.setAvatarUrl(map.getAvatarUrl());
+            return dto;
+        }).toList();
+    }
+
     @Transactional
-    public ActorDTO updateActor(Long id, UpdateActorRequest request){
+    public ActorDTO updateActor(Long id, UpdateActorRequest request) {
         Actor existingActor = actorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Actor not found"));
         ActorDTO actorDTO = new ActorDTO();
-        if(existingActor != null){
-            existingActor.setName(request.name);
-            existingActor.setAvatarUrl(request.avatarUrl);
-            existingActor.setBiography(request.bio);
-            existingActor.setNationality(request.nationality);
-            existingActor.setBirthDate(request.birthDate);
+        if (existingActor != null) {
+            existingActor.setName(request.getName());
+            existingActor.setAvatarUrl(request.getAvatarUrl());
+            existingActor.setBiography(request.getAvatarUrl());
+            existingActor.setNationality(request.getNationality());
+            existingActor.setBirthDate(request.getBirthDate());
+            existingActor.setIsDeleted(request.getIsDeleted());
             actorRepository.save(existingActor);
 
 
@@ -88,6 +109,7 @@ public class ActorService {
             actorDTO.setBirthDate(existingActor.getBirthDate());
             actorDTO.setBio(existingActor.getBiography());
             actorDTO.setAvatarUrl(existingActor.getAvatarUrl());
+            actorDTO.setIsDeleted(existingActor.getIsDeleted());
 
         }
         return actorDTO;
