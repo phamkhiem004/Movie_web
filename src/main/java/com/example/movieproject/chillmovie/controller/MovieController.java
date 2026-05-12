@@ -50,14 +50,7 @@ public class MovieController {
     @Operation(summary = "Get movie detail", description = "API get movie by Id")
     @GetMapping("/details/{id}")
     public ResponseEntity<MovieDTO> getMovieByID(@PathVariable @Min(value = 1, message = "Movie Id must be greater than 0") Long id,
-                                                 @AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt) {
-        CustomUserDetails user = null;
-        if (jwt != null) {
-            user = new CustomUserDetails();
-            Long userId = jwt.getClaim("userId");
-            user.setId(userId);
-        }
-        assert user != null;
+                                                 @AuthenticationPrincipal CustomUserDetails user) {
         MovieDTO movie = movieService.getMovieDetail(id, user);
         return ResponseEntity.status(HttpStatus.OK).body(movie);
     }
@@ -100,13 +93,8 @@ public class MovieController {
 
     @Operation(summary = "Get list history movie", description = "API get list history movie")
     @GetMapping("/recent")
-    public ResponseEntity<List<WatchHistoryProjection>> getMovieHistoryByUser(@AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt) {
-        CustomUserDetails user = null;
-        if (jwt != null) {
-            user = new CustomUserDetails();
-            Long userId = jwt.getClaim("userId");
-            user.setId(userId);
-        }
+    public ResponseEntity<List<WatchHistoryProjection>> getMovieHistoryByUser(@AuthenticationPrincipal CustomUserDetails user) {
+
         List<WatchHistoryProjection> history = movieService.getAllHistoryMovies(user);
         return ResponseEntity.status(HttpStatus.OK).body(history);
     }

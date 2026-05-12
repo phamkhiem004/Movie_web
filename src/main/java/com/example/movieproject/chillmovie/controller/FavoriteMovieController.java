@@ -30,14 +30,8 @@ public class FavoriteMovieController {
 
     @Operation(summary = "Get list favorite movies", description = "API get all favourite movies")
     @GetMapping("/")
-    public ResponseEntity<List<MovieDTO>> getFavoriteMoviesByUser(@AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt) {
-        CustomUserDetails user = null;
-        if (jwt != null) {
-            user = new CustomUserDetails();
-            Long userId = jwt.getClaim("userId");
-            user.setId(userId);
-        }
-        assert user != null;
+    public ResponseEntity<List<MovieDTO>> getFavoriteMoviesByUser(@AuthenticationPrincipal CustomUserDetails user) {
+
         List<MovieDTO> movies = favoriteMovieService.getAllFavouriteMovies(user);
         return ResponseEntity.status(HttpStatus.OK).body(movies);
     }
@@ -45,15 +39,9 @@ public class FavoriteMovieController {
     // API Like phim
     @Operation(summary = "Like movie", description = "API like movie")
     @PostMapping("/like/{movieId}")
-    public ResponseEntity<RestResponse<Boolean>> likeMovie(@AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt,
+    public ResponseEntity<RestResponse<Boolean>> likeMovie(@AuthenticationPrincipal CustomUserDetails user,
                                                            @PathVariable Long movieId) {
-        CustomUserDetails user = null;
-        if (jwt != null) {
-            user = new CustomUserDetails();
-            Long userId = jwt.getClaim("userId");
-            user.setId(userId);
-        }
-        assert user != null;
+
         Boolean liked = favoriteMovieService.likeMovie(user, movieId);
         RestResponse<Boolean> res = new RestResponse<>();
         res.setStatusCode(200);
@@ -66,16 +54,10 @@ public class FavoriteMovieController {
     // API Unlike phim
     @Operation(summary = "Unlike movie", description = "API unlike movie")
     @DeleteMapping("/unlike/{movieId}")
-    public ResponseEntity<RestResponse<Boolean>> unlikeMovie(@AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt,
+    public ResponseEntity<RestResponse<Boolean>> unlikeMovie(@AuthenticationPrincipal CustomUserDetails user,
                                                              @PathVariable Long movieId) {
 
-        CustomUserDetails user = null;
-        if (jwt != null) {
-            user = new CustomUserDetails();
-            Long userId = jwt.getClaim("userId");
-            user.setId(userId);
-        }
-        assert user != null;
+
         Boolean unliked = favoriteMovieService.unlikeMovie(user, movieId);
         RestResponse<Boolean> res = new RestResponse<>();
         res.setStatusCode(200);
@@ -89,14 +71,9 @@ public class FavoriteMovieController {
     // API Check trạng thái Like
     @Operation(summary = "Check like movie", description = "API check like movie")
     @GetMapping("/check/{movieId}")
-    public ResponseEntity<RestResponse<Boolean>> checkLikeStatus(@AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt,
+    public ResponseEntity<RestResponse<Boolean>> checkLikeStatus(@AuthenticationPrincipal CustomUserDetails user,
                                                                  @PathVariable Long movieId) {
-        CustomUserDetails user = null;
-        if (jwt != null) {
-            user = new CustomUserDetails();
-            Long userId = jwt.getClaim("userId");
-            user.setId(userId);
-        }
+
         assert user != null;
         Boolean check = favoriteMovieService.checkIfUserLikedMovie(user, movieId);
         RestResponse<Boolean> res = new RestResponse<>();

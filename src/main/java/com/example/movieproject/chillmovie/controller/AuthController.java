@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @Tag(name = "Auth Controller")
+@RequestMapping("/auth")
 @RestController
 public class AuthController {
 
@@ -161,6 +162,49 @@ public class AuthController {
 
         }finally {
             //direct to login page
+        }
+    }
+    @Operation(summary = "Logout", description = "API logout")
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(Authentication authentication,
+                                    @RequestHeader("Authorization") String authHeader) {
+
+        try {
+
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.badRequest().body("Token không hợp lệ");
+            }
+
+            String token = authHeader.substring(7);
+
+            String username = securityUtil.extractUsername(token);
+
+            // 1. Xóa token trong Redis
+            redisTokenService.delete(username);
+
+            // 2. Revoke token trong DB
+            Token storedToken = tokenService.findByAccessToken(token);
+
+            if (storedToken != null) {
+                storedToken.setRevoked(true);
+                storedToken.setExpired(true);
+
+                tokenService.save(storedToken);
+            }
+
+            RestResponse<String> res = new RestResponse<>();
+            res.setStatusCode(200);
+            res.setMessage("Logout successful");
+
+            return ResponseEntity.ok(res);
+
+        } catch (Exception e) {
+
+            RestResponse<String> res = new RestResponse<>();
+            res.setStatusCode(500);
+            res.setMessage("Logout failed");
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
         }
     }
 }

@@ -90,7 +90,7 @@ public class SecurityConfiguration {
 
                         .requestMatchers(
                                 "/",
-                                "/login", "/register",
+                                "/auth/**",
                                 "/actor/", "/actor/details/**",
                                 "/movie/", "/movie/details/**", "movie/genre/", "movie/actor/", "movie/type",
                                 "/search/**",
@@ -108,7 +108,7 @@ public class SecurityConfiguration {
 
 
                         ).hasAnyAuthority("ROLE_ADMIN")
-                        .requestMatchers("/favorite/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                        .requestMatchers("/favorite/**","/movie/recent").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
 
                         .anyRequest().authenticated()
 
