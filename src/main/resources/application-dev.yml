@@ -9,6 +9,11 @@ spring:
   mail:
     username: anucius1@gmail.com
     password: ${MAIL_PASSWORD}
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
+      password: ${SPRING_REDIS_PASSWORD:}
 open:
   api:
     serverUrl: http://localhost:${server.port}

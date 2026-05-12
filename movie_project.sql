@@ -67,7 +67,7 @@ VALUES
      '2026-03-03 22:59:26', '2026-04-16 22:33:25'),
     (3,  'abc',      'abc@gmail.com',
      '$2a$10$KmWMNnIVSzIqoOE8A9T.iuZ5Rbow0u2RYDrkSMP89RTYZ1umnO7ha',
-     'Abc', NULL, 1, 'INACTIVE', FALSE, NULL, NULL, NULL,
+     'Abc', NULL, 1, 'ACTIVE', FALSE, NULL, NULL, NULL,
      NULL, '2026-05-07 16:57:08'),
     (19, 'tula5904', 'tula5904@gmail.com',
      '$2a$10$x43ExbRAS26ZKw/N6lThf.bisvYalWlpTLDNa9BLqWaadSDn4Tql6',

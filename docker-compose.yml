@@ -14,6 +14,8 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
       retries: 10
+    networks:
+      - backend          # ← THÊM: cùng network với redis và api
 
   redis:
     image: redis:6.2-alpine
@@ -24,6 +26,10 @@ services:
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
       - REDIS_DISABLE_COMMANDS=FLUSHDB;FLUSHALL
+    healthcheck:                                    # ← THÊM: healthcheck
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 10s
+      retries: 5
     networks:
       - backend
 
@@ -36,26 +42,40 @@ services:
       - SPRING_PROFILES_ACTIVE=dev
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/movie_project
       - SPRING_DATASOURCE_USERNAME=root
-      - MAIL_PASSWORD=${MAIL_PASSWORD}
       - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - JWT_SECRET=${JWT_SECRET}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      # ── THÊM: Redis config ──────────────────────────
+      - SPRING_REDIS_HOST=redis       # tên container = hostname
+      - SPRING_REDIS_PORT=6379
+      - SPRING_REDIS_PASSWORD=        # để trống vì ALLOW_EMPTY_PASSWORD=yes
     depends_on:
       mysql-db:
         condition: service_healthy
+      redis:                          # ← THÊM: chờ redis healthy
+        condition: service_healthy
+    networks:
+      - backend                       # ← THÊM: cùng network
 
   api-test:
     image: api-image-sample
     container_name: movie-container-test
     ports:
-      - "8081:8080" # Chạy cổng 8081
+      - "8081:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=test
       - JWT_SECRET=${JWT_SECRET}
       - MAIL_PASSWORD=${MAIL_PASSWORD}
+      # ── THÊM nếu môi trường test cũng cần Redis ──
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+    networks:
+      - backend                       # ← THÊM nếu cần Redis
 
 volumes:
   mysql_data:
+
 networks:
   backend:
     driver: bridge

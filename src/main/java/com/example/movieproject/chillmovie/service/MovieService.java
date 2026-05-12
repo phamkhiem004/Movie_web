@@ -21,17 +21,15 @@ public class MovieService {
     private final MovieRepository movieRepository;
     private final MovieGenreRepository movieGenreRepository;
     private final MovieActorRepository movieActorRepository;
-    private final UserRepository userRepository;
     private final GenreRepository genreRepository;
     private final ActorRepository actorRepository;
     private final WatchHistoryRepository watchHistoryRepository;
     private final EpisodeRepository episodeRepository;
 
-    public MovieService(MovieRepository movieRepository, MovieGenreRepository movieGenreRepository, MovieActorRepository movieActorRepository, UserRepository userRepository, GenreRepository genreRepository, ActorRepository actorRepository, WatchHistoryRepository watchHistoryRepository, EpisodeRepository episodeRepository) {
+    public MovieService(MovieRepository movieRepository, MovieGenreRepository movieGenreRepository, MovieActorRepository movieActorRepository, GenreRepository genreRepository, ActorRepository actorRepository, WatchHistoryRepository watchHistoryRepository, EpisodeRepository episodeRepository) {
         this.movieRepository = movieRepository;
         this.movieGenreRepository = movieGenreRepository;
         this.movieActorRepository = movieActorRepository;
-        this.userRepository = userRepository;
         this.genreRepository = genreRepository;
         this.actorRepository = actorRepository;
         this.watchHistoryRepository = watchHistoryRepository;

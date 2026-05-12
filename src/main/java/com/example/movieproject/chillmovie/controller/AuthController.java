@@ -5,9 +5,13 @@ import com.example.movieproject.chillmovie.DTO.CreateUserRequest;
 import com.example.movieproject.chillmovie.DTO.LoginDTO;
 import com.example.movieproject.chillmovie.DTO.RegisterDTO;
 import com.example.movieproject.chillmovie.DTO.ResLoginDTO;
+import com.example.movieproject.chillmovie.entity.RedisToken;
+import com.example.movieproject.chillmovie.entity.Token;
 import com.example.movieproject.chillmovie.entity.RestResponse;
 import com.example.movieproject.chillmovie.entity.User;
 import com.example.movieproject.chillmovie.entity.UserStatus;
+import com.example.movieproject.chillmovie.service.RedisTokenService;
+import com.example.movieproject.chillmovie.service.TokenService;
 import com.example.movieproject.chillmovie.service.UserService;
 import com.example.movieproject.chillmovie.util.SecurityUtil;
 import com.example.movieproject.config.Translator;
@@ -33,11 +37,15 @@ public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final SecurityUtil securityUtil;
     private final UserService userService;
+    private final TokenService tokenService;
+    private final RedisTokenService redisTokenService;
 
-    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil, UserService userService) {
+    public AuthController(AuthenticationManagerBuilder authenticationManagerBuilder, SecurityUtil securityUtil, UserService userService, TokenService tokenService, RedisTokenService redisTokenService) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.securityUtil = securityUtil;
         this.userService = userService;
+        this.tokenService = tokenService;
+        this.redisTokenService = redisTokenService;
     }
 
     @Operation(summary = "Login", description = "API login")
@@ -77,6 +85,19 @@ public class AuthController {
 
             // Tạo token và trả về
             String access_token = this.securityUtil.createToken(authentication);
+            // ── THÊM MỚI: lưu vào MySQL ──────────────────────────
+            tokenService.save(Token.builder()
+                    .user(user)
+                    .accessToken(access_token)
+                    .expired(false)
+                    .revoked(false)
+                    .build());
+
+            // ── THÊM MỚI: lưu vào Redis ──────────────────────────
+            redisTokenService.save(RedisToken.builder()
+                    .id(loginDTO.getUsername())
+                    .accessToken(access_token)
+                    .build());
             ResLoginDTO resLoginDTO = new ResLoginDTO();
             resLoginDTO.setToken(access_token);
 
