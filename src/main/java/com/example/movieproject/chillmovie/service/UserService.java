@@ -11,7 +11,9 @@ import com.example.movieproject.chillmovie.respository.RoleRepository;
 import com.example.movieproject.chillmovie.respository.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.validation.constraints.Min;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,18 +27,15 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, MailService mailService) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.mailService = mailService;
-    }
+
 
     public List<UserDTO> findAllUsers() {
         List<User> users = userRepository.findAll();
@@ -76,7 +75,11 @@ public class UserService {
         User savedUser = userRepository.save(user);
         if(user.getId() != null) {
             //Send email confirm here
-            mailService.sendConfirmLink(user.getEmail(), user.getId(),generatedSecretCode);
+//            mailService.sendConfirmLink(user.getEmail(), user.getId(),generatedSecretCode);
+            String message = String.format("%s,%s,%s",user.getEmail(), user.getId(),generatedSecretCode );
+            kafkaTemplate.send("confirmAccount",message);
+
+
         }
 
         RegisterDTO dto = new RegisterDTO();
@@ -129,6 +132,9 @@ public class UserService {
     public User getUserByUserName(String username) {
         return userRepository.findByUsername(username).orElse(null);
 
+    }
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
     }
 
     @Transactional

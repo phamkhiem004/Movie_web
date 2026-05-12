@@ -1,4 +1,38 @@
 services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - '22181:2181'
+    networks:
+      - backend          # ← THÊM
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - '29092:29092'
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:                             # ← THÊM healthcheck
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    networks:
+      - backend          # ← THÊM
+
   mysql-db:
     image: mysql:8.0
     container_name: movie-mysql
@@ -15,7 +49,7 @@ services:
       timeout: 20s
       retries: 10
     networks:
-      - backend          # ← THÊM: cùng network với redis và api
+      - backend
 
   redis:
     image: redis:6.2-alpine
@@ -26,7 +60,7 @@ services:
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
       - REDIS_DISABLE_COMMANDS=FLUSHDB;FLUSHALL
-    healthcheck:                                    # ← THÊM: healthcheck
+    healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       timeout: 10s
       retries: 5
@@ -46,32 +80,19 @@ services:
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - JWT_SECRET=${JWT_SECRET}
       - MAIL_PASSWORD=${MAIL_PASSWORD}
-      # ── THÊM: Redis config ──────────────────────────
-      - SPRING_REDIS_HOST=redis       # tên container = hostname
+      - SPRING_REDIS_HOST=redis
       - SPRING_REDIS_PORT=6379
-      - SPRING_REDIS_PASSWORD=        # để trống vì ALLOW_EMPTY_PASSWORD=yes
+      - SPRING_REDIS_PASSWORD=
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092   # ← THÊM
     depends_on:
       mysql-db:
         condition: service_healthy
-      redis:                          # ← THÊM: chờ redis healthy
+      redis:
+        condition: service_healthy
+      kafka:                                         # ← THÊM
         condition: service_healthy
     networks:
-      - backend                       # ← THÊM: cùng network
-
-  api-test:
-    image: api-image-sample
-    container_name: movie-container-test
-    ports:
-      - "8081:8080"
-    environment:
-      - SPRING_PROFILES_ACTIVE=test
-      - JWT_SECRET=${JWT_SECRET}
-      - MAIL_PASSWORD=${MAIL_PASSWORD}
-      # ── THÊM nếu môi trường test cũng cần Redis ──
-      - SPRING_REDIS_HOST=redis
-      - SPRING_REDIS_PORT=6379
-    networks:
-      - backend                       # ← THÊM nếu cần Redis
+      - backend
 
 volumes:
   mysql_data:

@@ -123,6 +123,18 @@ public class AuthController {
             res.setStatusCode(403);
             res.setMessage("Tên tài khoản đã tồn tại");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);}
+
+        User existedEmail = userService.getUserByEmail(user.getEmail());
+
+        if (existedEmail != null) {
+            RestResponse<String> res = new RestResponse<>();
+            res.setStatusCode(400);
+            res.setMessage("Email đã tồn tại");
+
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(res);
+        }
         RegisterDTO dto = this.userService.createUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
 
