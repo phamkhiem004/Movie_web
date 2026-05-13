@@ -6,6 +6,7 @@ import com.example.movieproject.chillmovie.DTO.WatchHistoryDTO;
 import com.example.movieproject.chillmovie.DTO.WatchHistoryRequest;
 import com.example.movieproject.chillmovie.service.MovieViewService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/views")
+@Tag(name = "Movie-View")
 public class MovieViewController {
 
     private final MovieViewService movieViewService;
