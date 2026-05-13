@@ -100,7 +100,7 @@ public class SecurityConfiguration {
                                 "/confirm/**"
 
                         ).permitAll()
-                        .requestMatchers("/users").hasAnyAuthority("ROLE_ADMIN")
+                        .requestMatchers("/user/**").hasAnyAuthority("ROLE_ADMIN")
                         .requestMatchers(
                                 "movie/create", "movie/update/", "movie/delete/", "/movie/admin",
                                 "actor/create", "actor/update/", "actor/admin/",
@@ -108,7 +108,7 @@ public class SecurityConfiguration {
 
 
                         ).hasAnyAuthority("ROLE_ADMIN")
-                        .requestMatchers("/favorite/**","/movie/recent").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
+                        .requestMatchers("/favorite/**","/movie/recent", "/views/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
 
                         .anyRequest().authenticated()
 

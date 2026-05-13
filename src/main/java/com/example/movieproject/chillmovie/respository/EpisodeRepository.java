@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface EpisodeRepository extends JpaRepository<Episode,Integer> {
+public interface EpisodeRepository extends JpaRepository<Episode,Long> {
 
     // Lấy danh sách tập theo movie
     List<Episode> findByMovieIdOrderByEpisodeNumberAsc(Long movieId);

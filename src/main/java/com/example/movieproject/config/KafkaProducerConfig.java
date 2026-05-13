@@ -44,4 +44,14 @@ public class KafkaProducerConfig {
         return new NewTopic("confirmAccount", 3, (short) 1);
 
     }
+
+    @Bean
+    public NewTopic movieViewTopic() {
+        return new NewTopic("movieView", 3, (short) 1);
+    }
+
+    @Bean
+    public NewTopic watchHistoryTopic() {
+        return new NewTopic("watchHistory", 3, (short) 1);
+    }
 }
