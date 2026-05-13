@@ -70,5 +70,53 @@ Follow these instructions to get a copy of the project up and running on your lo
 Instead of installing MySQL, Redis, and Kafka manually, use Docker Compose to spin up the infrastructure:
 
 ```bash
+
 # Start MySQL, Redis, Zookeeper, and Kafka in the background
 docker-compose up -d
+3. Application Configuration
+Locate the src/main/resources/application-dev.yml (or .properties) file and update the following environment variables:
+
+Properties
+# Database Configuration
+spring.datasource.url=jdbc:mysql://localhost:3306/movie_project
+spring.datasource.username=your_db_username
+spring.datasource.password=your_db_password
+
+# JWT Secret Key (Base64 Encoded)
+khiem.jwt.base64-secret=YOUR_BASE64_ENCODED_SECRET_KEY_HERE
+
+# Email SMTP Configuration (Google App Password required)
+spring.mail.username=your_email@gmail.com
+spring.mail.password=your_google_app_password
+(Note: Never commit your actual App Passwords or JWT Secrets to a public repository).
+
+4. Build and Run
+Option A: Running Locally via Maven (Dev Profile)
+You can run the application directly using the Maven wrapper, specifying the dev profile:
+
+Bash
+# Clean and build the project for the 'dev' environment
+./mvnw clean install -Pdev
+
+# Run the Spring Boot application using the 'dev' profile
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+Option B: Running via Docker (Prod Profile)
+To package the application and run it as a Docker container for production:
+
+Bash
+# 1. Build the production executable JAR
+./mvnw clean package -Pprod -DskipTests
+
+# 2. Build the Docker image
+docker build -t chill-movie-api:latest .
+
+# 3. Run the application using Docker
+docker run -d -p 8080:8080 --name chill-movie-app chill-movie-api:latest
+📚 API Documentation
+Once the application is running, you can access the interactive API documentation and test the endpoints directly via Swagger UI:
+
+Swagger UI: http://localhost:8080/swagger-ui.html
+
+OpenAPI JSON: http://localhost:8080/v3/api-docs
+
+An exported Postman/OpenAPI collection is also available in the repository as api-document.json.
