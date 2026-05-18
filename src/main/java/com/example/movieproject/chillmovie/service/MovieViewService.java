@@ -65,8 +65,6 @@ public class MovieViewService {
         int durationSeconds = duration * 60;
         boolean completed = durationSeconds > 0
                 && seconds >= (int)(durationSeconds * 0.9);
-
-        // UPSERT — insert nếu chưa có, update nếu đã có
         watchHistoryRepository.upsert(userId, movieId, episodeId, seconds, completed);
         log.info("UPSERT OK — userId={} completed={}", userId, completed);
     }

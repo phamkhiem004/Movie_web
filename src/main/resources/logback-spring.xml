@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Import cấu hình mặc định của Spring Boot -->
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <!-- App name -->
+    <property name="APP_NAME" value="movie-api"/>
+
+    <!-- Logstash host -->
+    <property name="LOGSTASH_HOST" value="${LOGSTASH_HOST:-localhost}"/>
+
+    <!-- Console appender -->
+    <appender name="CONSOLE"
+              class="ch.qos.logback.core.ConsoleAppender">
+
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+
+            <providers>
+
+                <!-- Timestamp -->
+                <timestamp>
+                    <fieldName>@timestamp</fieldName>
+                </timestamp>
+
+                <!-- Log level -->
+                <logLevel>
+                    <fieldName>level</fieldName>
+                </logLevel>
+
+                <!-- Logger -->
+                <loggerName>
+                    <fieldName>logger</fieldName>
+                </loggerName>
+
+                <!-- Thread -->
+                <threadName>
+                    <fieldName>thread</fieldName>
+                </threadName>
+
+                <!-- Message -->
+                <message/>
+
+                <!-- Stacktrace -->
+                <stackTrace>
+                    <fieldName>stacktrace</fieldName>
+                </stackTrace>
+
+                <!-- MDC -->
+                <mdc/>
+
+                <!-- Custom fields -->
+                <pattern>
+                    <pattern>
+                        {
+                        "appName":"${APP_NAME}"
+                        }
+                    </pattern>
+                </pattern>
+
+            </providers>
+
+        </encoder>
+    </appender>
+
+    <!-- Send logs to Logstash -->
+    <appender name="LOGSTASH"
+              class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+
+        <!-- Logstash TCP port -->
+        <destination>${LOGSTASH_HOST}:5060</destination>
+
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+
+    </appender>
+
+    <!-- Root logger -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="LOGSTASH"/>
+    </root>
+
+</configuration>

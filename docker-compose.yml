@@ -83,7 +83,8 @@ services:
       - SPRING_REDIS_HOST=redis
       - SPRING_REDIS_PORT=6379
       - SPRING_REDIS_PASSWORD=
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092   # ← THÊM
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - LOGSTASH_HOST=logstash
     depends_on:
       mysql-db:
         condition: service_healthy
@@ -91,8 +92,55 @@ services:
         condition: service_healthy
       kafka:                                         # ← THÊM
         condition: service_healthy
+      logstash:
+        condition: service_started
     networks:
       - backend
+
+
+  elasticsearch:
+    image: elasticsearch:7.17.10
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    networks:
+      - backend
+
+  kibana:
+    image: kibana:7.17.10
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - backend
+
+  logstash:
+    image: logstash:7.17.10
+    container_name: logstash
+
+    ports:
+      - "5060:5060"
+
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+
+    depends_on:
+      - elasticsearch
+
+    networks:
+      - backend
+
+
+
+
+
 
 volumes:
   mysql_data:
